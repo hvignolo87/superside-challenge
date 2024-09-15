@@ -1,0 +1,66 @@
+repos:
+  - repo: local
+    hooks:
+      - id: debug-statements
+        name: 🐛 debug
+        entry: poetry run debug-statement-hook
+        language: system
+        types: [python]
+        stages: [commit]
+
+      - id: trailing-whitespace
+        name: ✂️  trailing-whitespace
+        entry: poetry run trailing-whitespace-fixer
+        language: system
+        types_or: [dotenv, gitignore, makefile, markdown, plain-text, python, sh, terraform, text, toml, yaml]
+        stages: [commit]
+
+      - id: end-of-file-fixer
+        name: ⛔️ end-of-file-fixer
+        entry: poetry run end-of-file-fixer
+        language: system
+        types_or: [dotenv, gitignore, makefile, markdown, plain-text, python, sh, terraform, text, toml, yaml]
+        stages: [commit]
+
+      - id: detect-aws-credentials
+        name: ☁️​  detect-aws-credentials
+        entry: poetry run detect-aws-credentials
+        language: system
+        types_or: [dotenv, gitignore, makefile, markdown, plain-text, python, sh, terraform, text, toml, yaml]
+        stages: [commit]
+
+      - id: check-yaml
+        name: 🕵️‍♂️​  check-yaml
+        entry: poetry run check-yaml
+        language: system
+        types: [yaml]
+        stages: [commit]
+
+      - id: black
+        name: ♟️  black
+        entry: poetry run black
+        language: system
+        types: [python]
+        stages: [commit]
+
+      - id: mypy
+        name: 🆎 mypy
+        entry: poetry run mypy
+        args: [--config-file, mypy.ini]
+        language: system
+        types: [python]
+        stages: [commit]
+
+      - id: ruff
+        name: 🌟 ruff
+        entry: poetry run ruff check
+        language: system
+        types: [python]
+        stages: [commit]
+
+      - id: interrogate
+        name: 🔎 interrogate
+        entry: poetry run interrogate
+        language: system
+        types: [python]
+        stages: [commit]
