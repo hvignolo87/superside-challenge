@@ -1,0 +1,112 @@
+{
+    "mypy-type-checker.path": [
+        "${workspaceFolder}/.venv/bin/mypy"
+    ],
+    "mypy-type-checker.interpreter": [
+        "${workspaceFolder}/.venv/bin/python"
+    ],
+    "mypy-type-checker.args": [
+        "--config-file",
+        "${workspaceFolder}/mypy.ini"
+    ],
+    "mypy-type-checker.importStrategy": "fromEnvironment",
+    "mypy.dmypyExecutable": "${workspaceFolder}/.venv/bin/dmypy",
+    "python.analysis.extraPaths": [],
+    "python.analysis.autoImportCompletions": true,
+    "ruff.lint.args": [
+        "--config",
+        "${workspaceFolder}/pyproject.toml"
+    ],
+    "ruff.path": [
+        "${workspaceFolder}/.venv/bin/ruff"
+    ],
+    "ruff.interpreter": [
+        "${workspaceFolder}/.venv/bin/python"
+    ],
+    "ruff.importStrategy": "fromEnvironment",
+    "ruff.lint.run": "onSave",
+    "ruff.showNotifications": "onError",
+    // Python formatting
+    "[python]": {
+        "editor.codeActionsOnSave": {
+            "source.organizeImports.ruff": "explicit",
+            "source.fixAll.ruff": "explicit"
+        },
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true,
+        "editor.formatOnType": true
+    },
+    "isort.path": [
+        "${workspaceFolder}/.venv/bin/isort"
+    ],
+    "isort.interpreter": [
+        "${workspaceFolder}/.venv/bin/python"
+    ],
+    "isort.args": [
+        "--profile",
+        "black"
+    ], // add settings file here if needed https://marketplace.visualstudio.com/items?itemName=ms-python.isort
+    "isort.importStrategy": "fromEnvironment",
+    "isort.check": false, // disabled isort in favor of ruff
+    "isort.serverEnabled": false, // disabled isort in favor of ruff
+    "black-formatter.path": [
+        "${workspaceFolder}/.venv/bin/black"
+    ],
+    "black-formatter.interpreter": [
+        "${workspaceFolder}/.venv/bin/python"
+    ],
+    "black-formatter.importStrategy": "fromEnvironment",
+    // SQL Linting
+    "sqlfluff.config": "${workspaceFolder}/dbt/superside_challenge/.sqlfluff",
+    "sqlfluff.dialect": "postgres",
+    "sqlfluff.env.customDotEnvFiles": [
+        "${workspaceFolder}/.env.dbt.local"
+    ],
+    "sqlfluff.env.useDotEnvFile": true,
+    "sqlfluff.ignoreLocalConfig": false,
+    "sqlfluff.ignoreParsing": false,
+    "sqlfluff.rules": [],
+    "sqlfluff.suppressNotifications": false,
+    "sqlfluff.workingDirectory": "",
+    "sqlfluff.executablePath": "${workspaceFolder}/.venv/bin/sqlfluff",
+    "sqlfluff.linter.arguments": [],
+    "sqlfluff.linter.run": "onSave",
+    "sqlfluff.linter.diagnosticSeverity": "error",
+    "sqlfluff.linter.diagnosticSeverityByRule": [
+        {
+            "rule": "L010",
+            "severity": "warning"
+        }
+    ],
+    "sqlfluff.linter.lintEntireProject": false,
+    "sqlfluff.experimental.format.executeInTerminal": true,
+    // Formatter
+    "sqlfluff.format.arguments": [
+        "--FIX-EVEN-UNPARSABLE"
+    ],
+    // just to avoid problems
+    "sqlfluff.format.enabled": true,
+    // dbt extension
+    "files.associations": {
+        "*.sql": "jinja-sql",
+        ".env*": "dotenv",
+        "*.yml": "jinja-yaml",
+        "*.yaml": "jinja-yaml"
+    },
+    "dbt.profilesDirOverride": "${workspaceFolder}/dbt/superside_challenge",
+    "dbt.targetPathOverride": "${workspaceFolder}/dbt/superside_challenge/target",
+    "dbt.queryLimit": 500,
+    "dbt.enableNewLineagePanel": true,
+    "python.envFile": "${workspaceFolder}/.env.dbt.local",
+    // modify this if you're not in OSX
+    "terminal.integrated.env.osx": {
+        "FIG_NEW_SESSION": "1",
+        "DBT_PROJECT_DIR": "${workspaceFolder}/dbt/superside_challenge",
+        "DBT_PROFILES_DIR": "${workspaceFolder}/dbt/superside_challenge"
+    },
+    "python.interpreter.infoVisibility": "always",
+    "[jinja-sql]": {
+        "editor.defaultFormatter": "dorzey.vscode-sqlfluff",
+        "editor.formatOnSave": false
+    }
+}

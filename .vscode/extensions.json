@@ -1,0 +1,16 @@
+{
+    "recommendations": [
+        "charliermarsh.ruff",
+        "christian-kohler.path-intellisense",
+        "dorzey.vscode-sqlfluff",
+        "hashicorp.terraform",
+        "innoverio.vscode-dbt-power-user",
+        "ms-python.black-formatter",
+        "ms-python.isort",
+        "ms-python.mypy-type-checker",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "redhat.vscode-yaml",
+        "samuelcolvin.jinjahtml",
+    ]
+}
