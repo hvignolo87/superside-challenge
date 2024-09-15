@@ -1,0 +1,102 @@
+[tool.poetry]
+name = "superside-challenge"
+version = "1.0.0"
+description = "Resolution of the Superside challenge for the Lead Data Engineer role"
+authors = ["Hernán Vignolo <vignolo.hernan@gmail.com>"]
+maintainers = ["Hernán Vignolo <vignolo.hernan@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/hvignolo87/superside-challenge"
+keywords = ["airflow", "airbyte", "dbt", "postgres", "data_engineering"]
+
+[tool.poetry.dependencies]
+python = "~3.10"
+
+[tool.poetry.group.dbt]
+optional = false
+
+[tool.poetry.group.dbt.dependencies]
+dbt-core = "1.5.6"
+astronomer-cosmos = { version = "1.2.5", extras = ["dbt-postgres"] }
+
+[tool.poetry.group.airflow]
+optional = false
+
+[tool.poetry.group.airflow.dependencies]
+apache-airflow = "2.6.3"
+apache-airflow-providers-dbt-cloud = "3.3.0"
+apache-airflow-providers-postgres = "5.5.1"
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.9.1"
+interrogate = "^1.5.0"
+mypy = "^1.6.0"
+nox = "^2023.4.22"
+pre-commit = "^3.4.0"
+pre-commit-hooks = "^4.5.0"
+ruff = "^0.0.292"
+sqlalchemy-stubs = "^0.4"
+sqlfluff = "^2.3.2"
+sqlfluff-templater-dbt = "^2.3.5"
+types-pytz = "^2023.3.1.1"
+types-pyyaml = "^6.0.12.12"
+types-requests = "2.31"
+
+[tool.ruff]
+extend-exclude = [".airflowignore", "__pycache__"]
+extend-select = ["AIR", "B", "D", "I", "N", "PL", "Q"]
+fix = true
+fixable = ["ALL"]
+ignore = ["D100", "D104", "D2", "D4"]
+line-length = 88
+output-format = "grouped"
+show-fixes = true
+show-source = true
+target-version = "py310"
+unfixable = []
+
+[tool.ruff.pycodestyle]
+ignore-overlong-task-comments = true
+max-doc-length = 88
+
+[tool.ruff.flake8-import-conventions]
+[tool.ruff.flake8-import-conventions.aliases]
+"matplotlib.pyplot" = "plt"
+numpy = "np"
+pandas = "pd"
+scipy = "sp"
+seaborn = "sns"
+
+[tool.ruff.isort]
+combine-as-imports = true
+force-sort-within-sections = true
+force-wrap-aliases = true
+relative-imports-order = "closest-to-furthest"
+split-on-trailing-comma = false
+
+[tool.black]
+line-length = 88
+skip-string-normalization = true
+
+[tool.interrogate]
+color = true
+fail-under = 40
+ignore-init-method = true
+ignore-init-module = false
+ignore-magic = false
+ignore-module = false
+ignore-private = false
+ignore-property-decorators = false
+ignore-regex = ["^get$", "^mock_.*", ".*BaseClass.*"]
+ignore-semiprivate = false
+quiet = false
+verbose = 0
+whitelist-regex = []
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
