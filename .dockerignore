@@ -1,0 +1,15 @@
+.git
+.gitignore
+
+.vscode
+__pycache__/
+.DS_Store
+.ruff_cache
+.mypy_cache
+.venv
+.nox
+
+.env
+.env.*
+
+logs/
