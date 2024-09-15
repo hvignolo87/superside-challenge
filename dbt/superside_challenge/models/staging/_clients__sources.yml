@@ -1,0 +1,62 @@
+version: 2
+
+sources:
+  - name: clients
+    description: ""
+    database: warehouse
+    schema: clients
+    tables:
+      - name: engagement_metrics
+        description: ""
+        columns:
+            - name: project_id
+              data_type: uuid
+              description: ""
+            - name: engagement_id
+              data_type: uuid
+              description: ""
+            - name: customer_id
+              data_type: character varying
+              description: ""
+            - name: customer_name
+              data_type: character varying
+              description: ""
+            - name: engagement_date
+              data_type: character varying
+              description: ""
+            - name: revenue
+              data_type: character varying
+              description: ""
+            - name: revenue_usd
+              data_type: character varying
+              description: ""
+            - name: service
+              data_type: character varying
+              description: ""
+            - name: sub_service
+              data_type: character varying
+              description: ""
+            - name: engagement_type
+              data_type: character varying
+              description: ""
+            - name: employee_count
+              data_type: character varying
+              description: ""
+            - name: comments
+              data_type: character varying
+              description: ""
+            - name: project_ref
+              data_type: uuid
+              description: ""
+            - name: engagement_reference
+              data_type: character varying
+              description: ""
+            - name: client_revenue
+              data_type: character varying
+              description: ""
+            - name: service_type
+              data_type: character varying
+              description: ""
+            - name: detailed_sub_service
+              data_type: character varying
+              description: ""

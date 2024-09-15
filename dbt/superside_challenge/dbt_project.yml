@@ -1,0 +1,50 @@
+name: 'superside_challenge'
+version: '1.0.0'
+config-version: 2
+
+profile: 'superside_challenge'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+target-path: "target"
+docs-paths: ["docs"]
+asset-paths: ["assets"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+  - "logs"
+
+quoting:
+  database: true
+  schema: true
+  identifier: true
+
+vars:
+  service_categories: ['Consulting', 'Design', 'Development', 'Support']
+  sub_service_categories: ['Backend', 'Frontend', 'UX/UI', 'Customer Service', 'Strategy']
+  engagement_type_categories: ['Recurring', 'One-time', 'New']
+
+models:
+  superside_challenge:
+    staging:
+      +materialized: view
+      +schema: staging
+      +tags:
+        - staging
+        - stg
+    intermediate:
+      +materialized: view
+      +schema: intermediate
+      +tags:
+        - intermediate
+        - int
+    marts:
+      +materialized: table
+      +schema: marts
+      +tags:
+        - marts

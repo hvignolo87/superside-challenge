@@ -1,0 +1,29 @@
+config:
+  partial_parse: true
+  version_check: false
+  send_anonymous_usage_stats: false
+  debug: true
+
+superside_challenge:
+  target: dev
+  outputs:
+    dev:
+      dbname: "{{ env_var('DBT_DB') }}"
+      host: "{{ env_var('DBT_HOST') }}"
+      port: "{{ env_var('DBT_PORT') | int }}"
+      type: postgres
+      threads: 4
+      user: "{{ env_var('DBT_USER') }}"
+      pass: "{{ env_var('DBT_PASSWORD') }}"
+      schema: "{{ env_var('DBT_SCHEMA') }}"
+      sslmode: disable
+    prod:
+      dbname: "{{ env_var('DBT_DB') }}"
+      host: "{{ env_var('DBT_HOST') }}"
+      port: "{{ env_var('DBT_PORT') | int }}"
+      type: postgres
+      threads: 10
+      user: "{{ env_var('DBT_USER') }}"
+      pass: "{{ env_var('DBT_PASSWORD') }}"
+      schema: prod
+      sslmode: disable

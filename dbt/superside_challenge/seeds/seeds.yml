@@ -1,0 +1,51 @@
+version: 2
+
+seeds:
+  - name: dim_project
+    config:
+      schema: marts
+      description: ""
+      column_types:
+        id: uuid
+        project_id: uuid
+        folder: character varying
+        status: character varying
+        name: character varying
+        staffing_version: character varying
+        description: character varying
+        internal_description: character varying
+        customer_id: integer
+        project_service_id: integer
+        service: character varying
+        sub_service: character varying
+        product_id: integer
+        product: character varying
+        team: character varying
+        team_type: character varying
+        team_id: uuid
+        cpm: character varying
+        cpm_id: uuid
+        dim_cpm_id: uuid
+        quality: character varying
+        rate: numeric
+        discount: numeric
+        min_estimate: numeric
+        max_estimate: numeric
+        sp_estimate: numeric
+        pm_estimate: numeric
+        ad_estimate: numeric
+        delivery: character varying
+        is_critical_delivery: boolean
+        is_critical_delivery_success: boolean
+        is_submitted_from_internal: boolean
+        is_created_with_deliverables: boolean
+        is_project_ai_enabled: boolean
+        timezone: character varying
+        date_project_created: timestamp
+        date_project_submitted: timestamp
+        date_project_deadline: timestamp
+        date_project_grabbed: timestamp
+        date_project_started: timestamp
+        date_project_ended: timestamp
+        date_project_updated: timestamp
+        source_app: character varying
