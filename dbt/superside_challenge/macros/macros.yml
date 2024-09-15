@@ -1,0 +1,54 @@
+version: 2
+
+macros:
+  - name: generate_schema_name
+    description: "Dynamically generates a schema name, depending on the environment"
+    docs:
+      show: false
+    arguments:
+      - name: custom_schema_name
+        type: string
+        description: "The schema defined in the profiles.yml, for the selected target"
+      - name: node
+        type: string
+        description: "Not used, but required to override the dbt macro"
+
+  - name: extract_number
+    description: Extracts a number from a string, and casts it to a given data type
+    docs:
+      show: false
+    arguments:
+      - name: column
+        type: string
+        description: "The name of the column to extract the number from"
+      - name: type
+        type: string
+        description: "The data type to cast the number to"
+      - name: alias
+        type: string
+        description: "The alias to use for the column"
+      - name: quote
+        type: boolean
+        description: "Optionally, whether to quote the column. Defaults to `False`."
+
+  - name: map_categories
+    description: |
+      Maps a given string to a list of categories, by comparing its Levenshtein distance to a threshold
+    docs:
+      show: false
+    arguments:
+      - name: column
+        type: string
+        description: "The name of the column to extract the category from"
+      - name: categories
+        type: array
+        description: "The list of categories to map to"
+      - name: max_distance
+        type: integer
+        description: "The maximum Levenshtein distance to consider a match"
+      - name: alias
+        type: string
+        description: "The alias to use for the column"
+      - name: quote
+        type: boolean
+        description: "Optionally, whether to quote the column. Defaults to `False`."

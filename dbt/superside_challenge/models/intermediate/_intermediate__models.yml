@@ -1,0 +1,57 @@
+version: 2
+
+models:
+  - name: int_engagement_metrics
+    description: ""
+    columns:
+      - name: project_id
+        data_type: uuid
+        description: ""
+      - name: engagement_id
+        data_type: uuid
+        description: ""
+      - name: customer_id
+        data_type: integer
+        description: ""
+      - name: comments
+        data_type: character varying
+        description: ""
+      - name: project_ref
+        data_type: uuid
+        description: ""
+      - name: engagement_reference
+        data_type: character varying
+        description: ""
+      - name: customer_name
+        data_type: text
+        description: ""
+      - name: engagement_date
+        data_type: date
+        description: ""
+      - name: employee_count
+        data_type: integer
+        description: ""
+      - name: revenue
+        data_type: numeric
+        description: ""
+      - name: revenue_usd
+        data_type: numeric
+        description: ""
+      - name: client_revenue
+        data_type: numeric
+        description: ""
+      - name: service
+        data_type: text
+        description: ""
+      - name: sub_service
+        data_type: character varying
+        description: ""
+      - name: engagement_type
+        data_type: character varying
+        description: ""
+      - name: service_type
+        data_type: character varying
+        description: ""
+      - name: detailed_sub_service
+        data_type: character varying
+        description: ""

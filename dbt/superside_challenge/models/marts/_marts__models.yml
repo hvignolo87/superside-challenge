@@ -1,0 +1,238 @@
+version: 2
+
+models:
+  - name: fct_engagement_metrics
+    description: ""
+    columns:
+      - name: project_id
+        data_type: uuid
+        description: ""
+      - name: engagement_id
+        data_type: uuid
+        description: ""
+      - name: customer_id
+        data_type: integer
+        description: ""
+      - name: comments
+        data_type: character varying
+        description: ""
+      - name: project_ref
+        data_type: uuid
+        description: ""
+      - name: engagement_reference
+        data_type: character varying
+        description: ""
+      - name: customer_name
+        data_type: text
+        description: ""
+      - name: engagement_date
+        data_type: date
+        description: ""
+      - name: employee_count
+        data_type: integer
+        description: ""
+      - name: revenue
+        data_type: numeric
+        description: ""
+      - name: revenue_usd
+        data_type: numeric
+        description: ""
+      - name: client_revenue
+        data_type: numeric
+        description: ""
+      - name: service
+        data_type: text
+        description: ""
+      - name: sub_service
+        data_type: character varying
+        description: ""
+      - name: engagement_type
+        data_type: character varying
+        description: ""
+      - name: service_type
+        data_type: character varying
+        description: ""
+      - name: detailed_sub_service
+        data_type: character varying
+        description: ""
+
+  - name: project_engagement
+    description: ""
+    columns:
+      - name: project_id
+        data_type: uuid
+        description: ""
+      - name: engagement_id
+        data_type: uuid
+        description: ""
+      - name: customer_id
+        data_type: integer
+        description: ""
+      - name: project_ref
+        data_type: uuid
+        description: ""
+      - name: engagement_reference
+        data_type: character varying
+        description: ""
+      - name: dim_customer_id
+        data_type: integer
+        description: ""
+      - name: project_service_id
+        data_type: integer
+        description: ""
+      - name: product_id
+        data_type: integer
+        description: ""
+      - name: team_id
+        data_type: uuid
+        description: ""
+      - name: cpm_id
+        data_type: uuid
+        description: ""
+      - name: dim_cpm_id
+        data_type: uuid
+        description: ""
+      - name: dim_project_id
+        data_type: uuid
+        description: ""
+      - name: customer_name
+        data_type: text
+        description: ""
+      - name: service
+        data_type: text
+        description: ""
+      - name: sub_service
+        data_type: character varying
+        description: ""
+      - name: dim_service
+        data_type: character varying
+        description: ""
+      - name: dim_sub_service
+        data_type: character varying
+        description: ""
+      - name: service_type
+        data_type: character varying
+        description: ""
+      - name: detailed_sub_service
+        data_type: character varying
+        description: ""
+      - name: engagement_type
+        data_type: character varying
+        description: ""
+      - name: folder
+        data_type: character varying
+        description: ""
+      - name: status
+        data_type: character varying
+        description: ""
+      - name: name
+        data_type: character varying
+        description: ""
+      - name: staffing_version
+        data_type: character varying
+        description: ""
+      - name: product
+        data_type: character varying
+        description: ""
+      - name: team
+        data_type: character varying
+        description: ""
+      - name: team_type
+        data_type: character varying
+        description: ""
+      - name: quality
+        data_type: character varying
+        description: ""
+      - name: delivery
+        data_type: character varying
+        description: ""
+      - name: source_app
+        data_type: character varying
+        description: ""
+      - name: comments
+        data_type: character varying
+        description: ""
+      - name: description
+        data_type: character varying
+        description: ""
+      - name: internal_description
+        data_type: character varying
+        description: ""
+      - name: cpm
+        data_type: character varying
+        description: ""
+      - name: is_critical_delivery
+        data_type: boolean
+        description: ""
+      - name: is_critical_delivery_success
+        data_type: boolean
+        description: ""
+      - name: is_submitted_from_internal
+        data_type: boolean
+        description: ""
+      - name: is_created_with_deliverables
+        data_type: boolean
+        description: ""
+      - name: is_project_ai_enabled
+        data_type: boolean
+        description: ""
+      - name: employee_count
+        data_type: integer
+        description: ""
+      - name: client_revenue
+        data_type: numeric
+        description: ""
+      - name: revenue
+        data_type: numeric
+        description: ""
+      - name: revenue_usd
+        data_type: numeric
+        description: ""
+      - name: rate
+        data_type: numeric
+        description: ""
+      - name: discount
+        data_type: numeric
+        description: ""
+      - name: min_estimate
+        data_type: numeric
+        description: ""
+      - name: max_estimate
+        data_type: numeric
+        description: ""
+      - name: sp_estimate
+        data_type: numeric
+        description: ""
+      - name: pm_estimate
+        data_type: numeric
+        description: ""
+      - name: ad_estimate
+        data_type: numeric
+        description: ""
+      - name: engagement_date
+        data_type: date
+        description: ""
+      - name: timezone
+        data_type: character varying
+        description: ""
+      - name: date_project_created
+        data_type: timestamp without time zone
+        description: ""
+      - name: date_project_submitted
+        data_type: timestamp without time zone
+        description: ""
+      - name: date_project_deadline
+        data_type: timestamp without time zone
+        description: ""
+      - name: date_project_grabbed
+        data_type: timestamp without time zone
+        description: ""
+      - name: date_project_started
+        data_type: timestamp without time zone
+        description: ""
+      - name: date_project_ended
+        data_type: timestamp without time zone
+        description: ""
+      - name: date_project_updated
+        data_type: timestamp without time zone
+        description: ""
