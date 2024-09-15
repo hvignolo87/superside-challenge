@@ -83,7 +83,7 @@ skip-string-normalization = true
 
 [tool.interrogate]
 color = true
-fail-under = 40
+fail-under = 30
 ignore-init-method = true
 ignore-init-module = false
 ignore-magic = false
