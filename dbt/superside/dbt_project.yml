@@ -1,8 +1,8 @@
-name: 'superside_challenge'
+name: 'superside'
 version: '1.0.0'
 config-version: 2
 
-profile: 'superside_challenge'
+profile: 'superside'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -30,7 +30,7 @@ vars:
   engagement_type_categories: ['Recurring', 'One-time', 'New']
 
 models:
-  superside_challenge:
+  superside:
     staging:
       +materialized: view
       +schema: staging

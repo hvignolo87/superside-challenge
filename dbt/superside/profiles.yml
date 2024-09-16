@@ -4,7 +4,7 @@ config:
   send_anonymous_usage_stats: false
   debug: true
 
-superside_challenge:
+superside:
   target: dev
   outputs:
     dev:
