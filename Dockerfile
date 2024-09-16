@@ -1,32 +1,34 @@
 # syntax=docker/dockerfile:1
-FROM apache/airflow:2.6.3-python3.10
+
+ARG PYTHON_VERSION=3.10.10
+FROM python:${PYTHON_VERSION} AS base
 
 USER root
 
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PIP_ROOT_USER_ACTION="ignore"
+ENV PATH="${PATH}:/root/.local/bin"
+
+WORKDIR /opt/airflow
+
+ARG POETRY_VERSION=1.6.1
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-	--mount=type=cache,target=/var/lib/apt,sharing=locked <<END
-		apt-get update && \
-		apt-get install --no-install-recommends --no-install-suggests -y \
-		build-essential \
-		gcc \
-		libtool \
-		libyaml-0-2 \
-		libyaml-dev \
-		libyaml-doc \
-		libpq-dev \
-		make \
-		python3-dev \
-		python3-pip \
-		python3-venv \
-		python3-wheel
-END
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    set -e && \
+    apt-get update -qy && \
+    pip install -U pip && \
+    curl -sSL https://install.python-poetry.org | POETRY_VERSION=${POETRY_VERSION} python3 - && \
+    poetry config virtualenvs.create false
 
-USER airflow
+COPY . .
 
-RUN --mount=type=cache,target=/home/airflow/.cache/pip \
-	pip install --upgrade pip && \
-	pip install --no-cache-dir \
-	"apache-airflow-providers-dbt-cloud==3.3.0" \
-	"apache-airflow-providers-postgres==5.5.1" \
-	"astronomer-cosmos[dbt-postgres]==1.2.5" \
-	"dbt-core==1.5.6"
+RUN --mount=type=cache,target=/root/.cache/pip \
+    --mount=type=cache,target=/root/.cache/pypoetry \
+    poetry install --no-interaction --all-extras --sync --without dev
+
+WORKDIR /opt/airflow/dbt/superside
+
+RUN poetry run dbt deps
+
+WORKDIR /opt/airflow
