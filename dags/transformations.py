@@ -14,6 +14,11 @@ from cosmos import (
     TestBehavior,
 )
 from settings import (
+    DBT_IMAGE,
+    DBT_JOB_NODE_SELECTOR,
+    DBT_K8S_ENV_VARS,
+    DBT_K8S_RESOURCES,
+    DBT_K8S_STARTUP_TIMEOUT_SECONDS,
     DBT_PROFILE_NAME,
     DBT_PROFILES_FILE,
     DBT_PROJECT_DIR,
@@ -39,7 +44,7 @@ DEFAULT_ARGS = {
         "data_engineering",
         "dbt",
         "PostgreSQL",
-        "superside_challenge",
+        "superside",
         "T",
         "transformations",
     ],
@@ -53,14 +58,14 @@ def dbt_pipeline():
     """
     **Transformations DAG**
 
-    This DAG executes the [dbt](https://www.getdbt.com/product/what-is-dbt) `superside_challenge` project with
+    This DAG executes the [dbt](https://www.getdbt.com/product/what-is-dbt) `superside` project with
     all its transformations using [cosmos](https://astronomer.github.io/astronomer-cosmos/).
 
     These are the airflow variables related to `dbt`:
-    - `DBT_PROJECT_DIR`: the path to the dbt project directory, default is `../dbt/superside_challenge` (we use `../dbt/superside_challenge/` here)
-    - `DBT_PROJECT_NAME`: the name of the dbt project, default is `superside_challenge` (we use `superside_challenge` here)
-    - `DBT_PROFILES_FILE`: the path to `profiles.yml` file, default is `../dbt/superside_challenge/profiles.yml` (we use `../dbt/superside_challenge/profiles.yml` here)
-    - `DBT_PROFILE_NAME`: the name of the profile to use, default is `superside_challenge` (we use `superside_challenge` here)
+    - `DBT_PROJECT_DIR`: the path to the dbt project directory, default is `../dbt/superside` (we use `../dbt/superside/` here)
+    - `DBT_PROJECT_NAME`: the name of the dbt project, default is `superside` (we use `superside` here)
+    - `DBT_PROFILES_FILE`: the path to `profiles.yml` file, default is `../dbt/superside/profiles.yml` (we use `../dbt/superside/profiles.yml` here)
+    - `DBT_PROFILE_NAME`: the name of the profile to use, default is `superside` (we use `superside` here)
     - `DBT_TARGET_NAME`: the name of the target to use, default is `dev` (we use `prod` here)
     """  # noqa: E501
 
@@ -77,14 +82,29 @@ def dbt_pipeline():
     )
 
     execution_config = ExecutionConfig(
-        execution_mode=ExecutionMode.LOCAL,
+        execution_mode=ExecutionMode.KUBERNETES,
     )
 
     operator_args = {
-        "append_env": True,
-        "install_deps": True,
-        "output_encoding": "utf-8",
+        "container_resources": DBT_K8S_RESOURCES,
+        "env_vars": DBT_K8S_ENV_VARS,
+        "get_logs": True,
+        "image": DBT_IMAGE,
+        "image_pull_policy": "Always",
+        "is_delete_operator_pod": True,
+        "namespace": "airflow",
         "no_version_check": True,
+        "node_selector": DBT_JOB_NODE_SELECTOR,
+        "output_encoding": "utf-8",
+        "reattach_on_restart": False,
+        "service_account_name": "airflow",
+        "startup_timeout_seconds": DBT_K8S_STARTUP_TIMEOUT_SECONDS,
+        "dbt_cmd_flags": [
+            "--profiles-dir",
+            f"{DBT_PROJECT_DIR / DBT_PROJECT_NAME}",
+            "--project-dir",
+            f"{DBT_PROJECT_DIR / DBT_PROJECT_NAME}",
+        ],
     }
 
     transformations_render_config = RenderConfig(
