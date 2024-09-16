@@ -57,7 +57,7 @@
     ],
     "black-formatter.importStrategy": "fromEnvironment",
     // SQL Linting
-    "sqlfluff.config": "${workspaceFolder}/dbt/superside_challenge/.sqlfluff",
+    "sqlfluff.config": "${workspaceFolder}/dbt/superside/.sqlfluff",
     "sqlfluff.dialect": "postgres",
     "sqlfluff.env.customDotEnvFiles": [
         "${workspaceFolder}/.env.dbt.local"
@@ -93,16 +93,16 @@
         "*.yml": "jinja-yaml",
         "*.yaml": "jinja-yaml"
     },
-    "dbt.profilesDirOverride": "${workspaceFolder}/dbt/superside_challenge",
-    "dbt.targetPathOverride": "${workspaceFolder}/dbt/superside_challenge/target",
+    "dbt.profilesDirOverride": "${workspaceFolder}/dbt/superside",
+    "dbt.targetPathOverride": "${workspaceFolder}/dbt/superside/target",
     "dbt.queryLimit": 500,
     "dbt.enableNewLineagePanel": true,
     "python.envFile": "${workspaceFolder}/.env.dbt.local",
     // modify this if you're not in OSX
     "terminal.integrated.env.osx": {
         "FIG_NEW_SESSION": "1",
-        "DBT_PROJECT_DIR": "${workspaceFolder}/dbt/superside_challenge",
-        "DBT_PROFILES_DIR": "${workspaceFolder}/dbt/superside_challenge"
+        "DBT_PROJECT_DIR": "${workspaceFolder}/dbt/superside",
+        "DBT_PROFILES_DIR": "${workspaceFolder}/dbt/superside"
     },
     "python.interpreter.infoVisibility": "always",
     "[jinja-sql]": {
