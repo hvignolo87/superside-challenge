@@ -1,0 +1,263 @@
+airflow:
+  image:
+    repository: apache/airflow
+    tag: 2.6.3-python3.10
+
+  executor: CeleryExecutor
+
+  fernetKey: "UKMzEm3yIuFYEq1y3-2FxPNWSVwRASpahmQ9kQfEr8E="
+
+  webserverSecretKey: "30693d9b48f28e655a250be4"
+
+  config:
+    AIRFLOW__CORE__FERNET_KEY: "UKMzEm3yIuFYEq1y3-2FxPNWSVwRASpahmQ9kQfEr8E="
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "True"
+    AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+    AIRFLOW__CORE__DAG_FILE_PROCESSOR_TIMEOUT: "5000"
+    AIRFLOW__CORE__CHECK_SLAS: "True"
+    AIRFLOW__CORE__DAGBAG_IMPORT_TIMEOUT: "60"
+    AIRFLOW__LOGGING__LOGGING_LEVEL: "INFO"
+    AIRFLOW__KUBERNETES__FS_GROUP: "65534"
+    AIRFLOW__SCHEDULER__SCHEDULER_HEARTBEAT_SEC: "5"
+    AIRFLOW__WEBSERVER__EXPOSE_CONFIG: True
+    AIRFLOW__WEBSERVER__INSTANCE_NAME: "DAGs | local environment"
+    AIRFLOW__API__AUTH_BACKENDS: "airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session"
+
+  users:
+    - username: airflow
+      password: airflow
+      role: Admin
+      email: admin@airflow.com
+      firstName: Hernán
+      lastName: Vignolo
+
+  variables:
+    - key: "DBT_PROJECT_DIR"
+      value: "/opt/airflow/dbt"
+    - key: "DBT_PROJECT_NAME"
+      value: "superside"
+    - key: "DBT_PROFILE_NAME"
+      value: "superside"
+    - key: "DBT_TARGET_NAME"
+      value: "prod"
+
+  defaultNodeSelector:
+    component: apps
+
+  defaultSecurityContext:
+    runAsUser: 50000
+    runAsGroup: 65534
+    fsGroup: 65534
+    fsUser: 50000
+
+  extraEnv:
+    - name: "DBT_USER"
+      value: "warehouse"
+    - name: "DBT_PASSWORD"
+      value: "warehouse"
+    - name: "DBT_HOST"
+      value: "warehouse"
+    - name: "DBT_PORT"
+      value: "5432"
+    - name: "DBT_DB"
+      value: "warehouse"
+
+  dbMigrations:
+    nodeSelector:
+      component: apps
+
+  sync:
+    resources: {}
+
+    nodeSelector:
+        component: apps
+
+scheduler:
+  replicas: 1
+
+  logCleanup:
+    enabled: true
+
+  securityContext:
+    runAsUser: 50000
+    runAsGroup: 65534
+    fsGroup: 65534
+    fsUser: 50000
+
+  resources: {}
+
+  nodeSelector:
+    component: apps
+
+  extraPipPackages:
+    - "dbt-core==1.5.6"
+    - "dbt-postgres==1.5.6"
+    - "astronomer-cosmos==1.2.5"
+    - "apache-airflow-providers-amazon==8.2.0"
+
+  extraVolumeMounts:
+    - name: local-fs-dags
+      mountPath: /mnt/host/dags
+    - name: local-fs-dags
+      mountPath: /opt/airflow/dags
+    - name: local-fs-dbt
+      mountPath: /mnt/host/dbt
+    - name: local-fs-dbt
+      mountPath: /opt/airflow/dbt
+
+  extraVolumes:
+    - name: local-fs-dags
+      hostPath:
+        path: /mnt/host/dags
+    - name: local-fs-dbt
+      hostPath:
+        path: /mnt/host/dbt
+
+web:
+  replicas: 1
+
+  securityContext:
+    runAsUser: 50000
+    runAsGroup: 65534
+    fsGroup: 65534
+    fsUser: 50000
+
+  resources: {}
+
+  nodeSelector:
+    component: apps
+
+  service:
+    annotations: {}
+    sessionAffinity: "None"
+    sessionAffinityConfig: {}
+    type: ClusterIP
+    externalPort: 8080
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    nodePort:
+      http: ""
+
+workers:
+  enabled: true
+
+  replicas: 1
+
+  securityContext:
+    runAsUser: 50000
+    runAsGroup: 65534
+    fsGroup: 65534
+    fsUser: 50000
+
+  resources: {}
+    # limits:
+    #   memory: 1.5Gi
+
+  nodeSelector:
+    component: apps
+
+  logCleanup:
+    enabled: true
+
+  extraPipPackages:
+    - "dbt-core==1.5.6"
+    - "dbt-postgres==1.5.6"
+    - "astronomer-cosmos==1.2.5"
+    - "apache-airflow-providers-amazon==8.2.0"
+
+  extraVolumeMounts:
+    - name: local-fs-dags
+      mountPath: /mnt/host/dags
+    - name: local-fs-dags
+      mountPath: /opt/airflow/dags
+    - name: local-fs-dbt
+      mountPath: /mnt/host/dbt
+    - name: local-fs-dbt
+      mountPath: /opt/airflow/dbt
+
+  extraVolumes:
+    - name: local-fs-dags
+      hostPath:
+        path: /mnt/host/dags
+    - name: local-fs-dbt
+      hostPath:
+        path: /mnt/host/dbt
+
+triggerer:
+  enabled: false
+
+flower:
+  enabled: false
+
+logs:
+  path: /opt/airflow/logs
+  persistence:
+    enabled: false
+
+dags:
+  path: /opt/airflow/dags
+  persistence:
+    enabled: false
+
+pgbouncer:
+  enabled: true
+
+  securityContext:
+    runAsUser: 50000
+    runAsGroup: 65534
+    fsGroup: 65534
+    fsUser: 50000
+
+  image:
+    repository: ghcr.io/airflow-helm/pgbouncer
+    tag: 1.22.1-patch.0
+    pullPolicy: IfNotPresent
+    uid: 1001
+    gid: 1001
+
+  resources: {}
+
+  nodeSelector:
+    component: apps
+
+postgresql:
+  enabled: false
+
+externalDatabase:
+  type: postgres
+  host: airflow-db
+  port: 5432
+  database: airflow
+  user: airflow
+  password: airflow
+
+redis:
+  enabled: true
+
+  image:
+    registry: docker.io
+    repository: bitnami/redis
+    tag: 6.2.14-debian-12-r17
+    pullPolicy: IfNotPresent
+
+  password: airflow
+
+  master:
+    nodeSelector:
+        component: apps
+
+    persistence:
+      enabled: false
+
+  slave:
+    nodeSelector:
+        component: apps
+
+    persistence:
+      enabled: false
+
+serviceAccount:
+  create: true
+  name: airflow
+  annotations:
+    eks.amazonaws.com/role-arn: "airflow"
