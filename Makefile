@@ -152,12 +152,12 @@ cluster-start: ## Start the stopped k3d cluster
 .PHONY: cluster-install-apps
 cluster-install-apps: set-k3d-context ## Install the required apps in the k8s cluster
 	$(call log, Installing apps in the k8s cluster...)
-	cd infra && terraform init && terraform apply -auto-approve -target helm_release.airflow
+	cd infra && terraform init && terraform apply -auto-approve
 
 .PHONY: cluster-uninstall-apps
 cluster-uninstall-apps: set-k3d-context ## Uninstall the required apps in the k8s cluster
 	$(call log, Uninstalling apps in the k8s cluster...)
-	cd infra && terraform init && terraform destroy -auto-approve -target helm_release.airflow
+	cd infra && terraform init && terraform destroy -auto-approve
 
 .PHONY: cluster-local-image
 cluster-local-image: ## Push the local image to the local registry
