@@ -42,7 +42,7 @@ airflow:
       value: "prod"
 
   defaultNodeSelector:
-    component: apps
+    component: airflow
 
   defaultSecurityContext:
     runAsUser: 50000
@@ -64,13 +64,13 @@ airflow:
 
   dbMigrations:
     nodeSelector:
-      component: apps
+      component: airflow
 
   sync:
     resources: {}
 
     nodeSelector:
-        component: apps
+      component: airflow
 
 scheduler:
   replicas: 1
@@ -87,7 +87,7 @@ scheduler:
   resources: {}
 
   nodeSelector:
-    component: apps
+    component: airflow
 
   extraPipPackages:
     - "dbt-core==1.5.6"
@@ -125,7 +125,7 @@ web:
   resources: {}
 
   nodeSelector:
-    component: apps
+    component: airflow
 
   service:
     annotations: {}
@@ -154,7 +154,7 @@ workers:
     #   memory: 1.5Gi
 
   nodeSelector:
-    component: apps
+    component: airflow
 
   logCleanup:
     enabled: true
@@ -218,7 +218,7 @@ pgbouncer:
   resources: {}
 
   nodeSelector:
-    component: apps
+    component: airflow
 
 postgresql:
   enabled: false
@@ -244,14 +244,14 @@ redis:
 
   master:
     nodeSelector:
-        component: apps
+      component: airflow
 
     persistence:
       enabled: false
 
   slave:
     nodeSelector:
-        component: apps
+      component: airflow
 
     persistence:
       enabled: false

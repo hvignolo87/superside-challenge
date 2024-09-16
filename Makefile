@@ -117,11 +117,12 @@ set-k3d-context: ## Set the current context to point to the k3d cluster
 cluster-create: ## Build and start the required docker services and the k3d cluster
 	${DOCKER_COMPOSE_CMD} up -d --build
 	k3d cluster create ${PROJECT_NAME} \
-		--agents 2 \
+		--agents 3 \
 		--agents-memory 4g \
 		--api-port 6443 \
-		--k3s-node-label component=apps@agent:0 \
-		--k3s-node-label component=jobs@agent:1 \
+		--k3s-node-label component=airbyte@agent:0 \
+		--k3s-node-label component=airflow@agent:1 \
+		--k3s-node-label component=jobs@agent:2 \
 		--port 8100:80@loadbalancer \
 		--servers 1 \
 		--servers-memory 4g \
