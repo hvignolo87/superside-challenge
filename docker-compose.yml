@@ -1,29 +1,60 @@
-name: airflow-platform
+name: external-services
 
-x-airflow-common:
-  &airflow-common
-  image: airflow-custom-local:latest
-  build:
-    dockerfile: ./Dockerfile
-    context: .
-  env_file:
-    - ./.env.airflow.local
-    - ./.env.dbt.local
-  volumes:
-    - ./dags:/opt/airflow/dags
-    - ./dbt:/opt/airflow/dbt:rw
-
-x-airflow-depends-on:
-  &airflow-depends-on
-  depends_on:
-    airflow-db-metadata:
-      condition: service_healthy
-    airflow-init:
-      condition: service_completed_successfully
+x-logging: &logging
+  driver: "json-file"
+  options:
+    max-size: 10m
+    max-file: "2"
 
 services:
+  airbyte-db:
+    image: postgres:${AIRBYTE_POSTGRES_VERSION:-14.7}
+    container_name: airbyte-db
+    hostname: airbyte-db
+    volumes:
+      - airbyte-db-volume:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${AIRBYTE_POSTGRES_USER:-airbyte}
+      - POSTGRES_PASSWORD=${AIRBYTE_POSTGRES_PASSWORD:-airbyte}
+      - POSTGRES_DB=${AIRBYTE_POSTGRES_DB:-airbyte}
+      - POSTGRES_PORT=${AIRBYTE_POSTGRES_PORT:-5432}
+    ports:
+      - ${AIRBYTE_POSTGRES_PORT_HOST:-5440}:${AIRBYTE_POSTGRES_PORT:-5432}
+    restart: on-failure
+    networks:
+      superside:
+        aliases:
+          - airbyte-db
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${AIRBYTE_POSTGRES_USER:-airbyte}"]
+      interval: 5s
+      retries: 5
+
+  airflow-db:
+    image: postgres:${AIRFLOW_POSTGRES_VERSION:-14.7}
+    container_name: airflow-db
+    hostname: airflow-db
+    volumes:
+      - airflow-db-volume:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${AIRFLOW_POSTGRES_USER:-airflow}
+      - POSTGRES_PASSWORD=${AIRFLOW_POSTGRES_PASSWORD:-airflow}
+      - POSTGRES_DB=${AIRFLOW_POSTGRES_DB:-airflow}
+      - POSTGRES_PORT=${AIRFLOW_POSTGRES_PORT:-5432}
+    ports:
+      - ${AIRFLOW_POSTGRES_PORT_HOST:-5450}:${AIRFLOW_POSTGRES_PORT:-5432}
+    restart: on-failure
+    networks:
+      superside:
+        aliases:
+          - airflow-db
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${AIRFLOW_POSTGRES_USER:-airflow}"]
+      interval: 5s
+      retries: 5
+
   warehouse:
-    image: postgres:${POSTGRES_VERSION:-14.7}
+    image: postgres:${WAREHOUSE_POSTGRES_VERSION:-14.7}
     container_name: warehouse
     hostname: warehouse
     volumes:
@@ -32,84 +63,44 @@ services:
       - ./source_data/engagement_metrics_raw.csv:/docker-entrypoint-initdb.d/source_data/engagement_metrics_raw.csv
       - ./source_data/dim_project.csv:/docker-entrypoint-initdb.d/source_data/dim_project.csv
     environment:
-      - POSTGRES_USER=warehouse
-      - POSTGRES_PASSWORD=warehouse
-      - POSTGRES_DB=warehouse
-      - POSTGRES_PORT=5432
+      - POSTGRES_USER=${WAREHOUSE_POSTGRES_USER:-warehouse}
+      - POSTGRES_PASSWORD=${WAREHOUSE_POSTGRES_PASSWORD:-warehouse}
+      - POSTGRES_DB=${WAREHOUSE_POSTGRES_DB:-warehouse}
+      - POSTGRES_PORT=${WAREHOUSE_POSTGRES_PORT:-5432}
     ports:
-      - 5444:${POSTGRES_PORT:-5432}
+      - ${WAREHOUSE_POSTGRES_PORT_HOST:-5460}:${WAREHOUSE_POSTGRES_PORT:-5432}
     restart: on-failure
     networks:
-      default:
+      superside:
         aliases:
           - warehouse
     healthcheck:
-      test: [ "CMD", "pg_isready", "-U", "warehouse" ]
+      test: ["CMD", "pg_isready", "-U", "${WAREHOUSE_POSTGRES_USER:-warehouse}"]
       interval: 5s
       retries: 5
 
-  airflow-db-metadata:
-    image: postgres:${POSTGRES_VERSION:-14.7}
-    container_name: airflow-db-metadata
-    hostname: airflow-db-metadata
-    env_file:
-      - ./.env.airflow.local
+  registry:
+    image: registry:${REGISTRY_VERSION:-2}
+    container_name: ${REGISTRY_SERVICE_NAME:-registry}
+    hostname: ${REGISTRY_SERVICE_NAME:-registry}
     volumes:
-      - airflow-db-metadata-volume:/var/lib/postgresql/data
+      - registry:/var/lib/registry
+    restart: always
+    logging: *logging
+    networks:
+      superside:
+        aliases:
+          - ${REGISTRY_SERVICE_NAME:-registry}
     ports:
-      - ${POSTGRES_PORT_HOST:-5440}:${POSTGRES_PORT:-5432}
-    restart: on-failure
-    healthcheck:
-      test: [ "CMD", "pg_isready", "-U", "${POSTGRES_USER:-airflow}" ]
-      interval: 5s
-      retries: 5
-
-  airflow-scheduler:
-    <<: [ *airflow-common, *airflow-depends-on ]
-    container_name: airflow-scheduler
-    command: scheduler
-    restart: on-failure
-    environment:
-      - DBT_HOST=warehouse
-      - DBT_PORT=5432
-    ports:
-      - 8793:8793
-
-  airflow-webserver:
-    <<: [ *airflow-common, *airflow-depends-on ]
-    container_name: airflow-webserver
-    restart: on-failure
-    command: webserver
-    ports:
-      - ${AIRFLOW_WEBSERVER_PORT_HOST:-8081}:8080
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "curl",
-          "--fail",
-          "http://localhost:${AIRFLOW_WEBSERVER_PORT_HOST:-8081}/health"
-        ]
-      interval: 30s
-      timeout: 30s
-      retries: 5
-
-  airflow-init:
-    <<: *airflow-common
-    container_name: airflow-init
-    entrypoint: /bin/bash
-    user: 0:0
-    command:
-      - -c
-      - |
-        mkdir -p /sources/logs /sources/dags /sources/plugins
-        chown -R "${AIRFLOW_UID:-0}:0" /sources/{logs,dags,plugins}
-        exec /entrypoint airflow db init
+      - ${REGISTRY_PORT:-5000}:5000
 
 volumes:
-  airflow-db-metadata-volume:
+  airbyte-db-volume:
+  airflow-db-volume:
   warehouse-volume:
+  registry:
 
 networks:
-  default:
-    name: airflow_internal
+  superside:
+    name: ${PROJECT_NAME:-superside}
+    driver: bridge
