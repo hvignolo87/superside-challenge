@@ -32,7 +32,7 @@ jobs:
 
       - name: Install development dependencies
         run: |
-          apt-get update && apt-get install --no-install-recommends --no-install-suggests git
+          apt-get update && apt-get install --no-install-recommends --no-install-suggests -y git
           pip install -U pip
           curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.6.1 python3 -
           export PATH="/root/.local/bin:$PATH"
