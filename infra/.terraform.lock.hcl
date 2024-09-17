@@ -1,6 +1,29 @@
 # This file is maintained automatically by "terraform init".
 # Manual edits may be lost in future updates.
 
+provider "registry.terraform.io/airbytehq/airbyte" {
+  version     = "0.6.2"
+  constraints = "0.6.2"
+  hashes = [
+    "h1:69Efvp8dj3Wx1kmBV8iw3F3a7UW5JEd7e0b2121f6i4=",
+    "zh:052d7cd3a0c614544a5969948a480291a5260dc91f2ae177b7a9e7c10951bf0f",
+    "zh:2aa09272e03d76adce4c721aed426166b465425f9ef0d92cd3d94d865a9c6f86",
+    "zh:37dde1de5e5a7f292e0f85d76ad2c93e6847b56e4a59f43eee325ce6146f0129",
+    "zh:4041da48bd492a982489086286680ec4f9b7c121e508d6f8e0180d815cf84d86",
+    "zh:4add89654822c7754fab8e23d66acb4a823b6889ffcb93b8e9574e5c74f3c2aa",
+    "zh:5caa90282d112ea75554b5c4c0cbf9752e2988e6c55a9434437aa6bd09a02ffb",
+    "zh:5f800c79bd62439a30af48a4b3984cdddf6e7306c518e96375aa82676af4e328",
+    "zh:890df766e9b839623b1f0437355032a3c006226a6c200cd911e15ee1a9014e9f",
+    "zh:92f335c36f46cd43cfe7062de2ddc8fa147e1f687977827a006c514dad31579e",
+    "zh:b1b5c9862e4b56cc2d50836553e3febbdefbae0a69136aea8a3fba42c2ee8fc6",
+    "zh:b5de1378effc4b8580c9bb22c115a5e697d4bed4528e870dc058b45f2cfadfae",
+    "zh:d89f1c000a5260175f8987293ec7ffe91bb30e0825b856dae0a3d4729e4c794a",
+    "zh:df5a6b60cda963b7e45d8a07fef9463268ecfe9e173b459daaef726d0d0920a3",
+    "zh:f964644d673425587f4e8ddea6a3d75eaedcec1c90e674b823a056ffc0713b9a",
+    "zh:fc856423a54196bbf494b5d4dd2a9c19afa8c847044387d1b8200b96bc014c44",
+  ]
+}
+
 provider "registry.terraform.io/hashicorp/helm" {
   version = "2.15.0"
   hashes = [
