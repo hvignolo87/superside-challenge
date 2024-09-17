@@ -65,3 +65,23 @@ repos:
         language: system
         types: [python]
         stages: [commit]
+
+      - id: sqlfluff-fix-dbt
+        name: 🚀 sqlfluff-fix-dbt
+        entry: poetry run sqlfluff fix
+        files: ^dbt/
+        args: [--force, --config, ./dbt/superside/.sqlfluff]
+        language: system
+        description: 'Fixes SQL lint errors with `SQLFluff` in the dbt directory'
+        types: [sql]
+        stages: [manual]
+
+      - id: sqlfluff-lint-dbt
+        name: 🚀 sqlfluff-lint-dbt
+        entry: poetry run sqlfluff lint
+        files: ^dbt/
+        args: [--config, ./dbt/superside/.sqlfluff]
+        language: system
+        description: 'Lints SQL files with `SQLFluff` in the dbt directory'
+        types: [sql]
+        stages: [manual]
