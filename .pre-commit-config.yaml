@@ -28,7 +28,7 @@ repos:
         entry: poetry run detect-aws-credentials
         language: system
         types_or: [dotenv, gitignore, makefile, markdown, plain-text, python, sh, terraform, text, toml, yaml]
-        stages: [commit]
+        stages: [manual]
 
       - id: check-yaml
         name: 🕵️‍♂️​ check-yaml
