@@ -30,7 +30,7 @@ jobs:
           key: nox-hooks-${{ hashFiles('**/poetry.lock') }}
           restore-keys: nox-hooks-
 
-      - name: Install development dependencies
+      - name: Code quality check
         run: |
           apt-get update && apt-get install --no-install-recommends --no-install-suggests -y git
           git init
@@ -40,7 +40,4 @@ jobs:
           echo "/github/home/.local/bin" >> ${GITHUB_PATH}
           poetry config virtualenvs.in-project true
           poetry install --no-interaction --only dev
-
-      - name: Code quality check
-        run: |
           poetry run nox --session hooks
