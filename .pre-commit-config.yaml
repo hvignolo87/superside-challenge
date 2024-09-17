@@ -18,6 +18,7 @@ repos:
       - id: end-of-file-fixer
         name: ⛔️ end-of-file-fixer
         entry: poetry run end-of-file-fixer
+        exclude: ^source_data/
         language: system
         types_or: [dotenv, gitignore, makefile, markdown, plain-text, python, sh, terraform, text, toml, yaml]
         stages: [commit]
