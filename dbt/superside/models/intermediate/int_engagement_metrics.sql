@@ -12,12 +12,12 @@ SELECT
     , project_ref
     , engagement_reference
     , CASE
-		WHEN customer_name IS NULL
-			THEN NULL
-		WHEN POSITION('_' IN customer_name) = 0
-			THEN 'customer_' || SUBSTRING(SPLIT_PART(customer_name, 'customer', 2) FROM '[0-9]+')
-		WHEN POSITION('_' IN customer_name) > 0
-			THEN 'customer_' || SUBSTRING(SPLIT_PART(customer_name, '_', 2) FROM '[0-9]+')
+        WHEN customer_name IS NULL
+            THEN NULL
+        WHEN POSITION('_' IN customer_name) = 0
+            THEN 'customer_' || SUBSTRING(SPLIT_PART(customer_name, 'customer', 2) FROM '[0-9]+')
+        WHEN POSITION('_' IN customer_name) > 0
+            THEN 'customer_' || SUBSTRING(SPLIT_PART(customer_name, '_', 2) FROM '[0-9]+')
     END AS customer_name
     , CASE
         WHEN engagement_date ~ '^\d{2}/\d{2}/\d{4}$'

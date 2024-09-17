@@ -71,4 +71,4 @@ SELECT
     , dim_project.date_project_updated
 FROM {{ ref('fct_engagement_metrics') }} AS metrics
 LEFT JOIN {{ ref('dim_project') }} AS dim_project
-	ON metrics.project_id = dim_project.project_id
+    ON metrics.project_id = dim_project.project_id
