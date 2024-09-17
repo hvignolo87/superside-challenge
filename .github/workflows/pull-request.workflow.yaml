@@ -6,7 +6,6 @@ jobs:
   lint:
     name: Code quality check
     runs-on: [ubuntu]
-    needs: prepare_commons
     container: python:3.10.12
     services:
       postgres:
