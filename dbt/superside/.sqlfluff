@@ -1,0 +1,102 @@
+# Default configuration: https://docs.sqlfluff.com/en/stable/configuration.html#default-configuration
+
+# Global configs
+[sqlfluff]
+templater = dbt
+dialect = postgres
+verbose = 0
+sql_file_exts = .sql
+max_line_length = 140
+# Comma separated list of rules to exclude, or None
+exclude_rules = L044,L059,L034
+# Number of passes to run before admitting defeat
+runaway_limit = 5
+large_file_skip_byte_limit = 45000
+# CPU processes to use while linting.
+# If positive, just implies number of processes.
+# If negative or zero, implies number_of_cpus - specified_number.
+# e.g. -1 means use all processors but one. 0  means all cpus.
+processes = -1
+
+
+[sqlfluff:templater:jinja]
+apply_dbt_builtins = True
+load_macros_from_path = ./macros/
+
+[sqlfluff:templater:dbt]
+project_dir = .
+profiles_dir = .
+profile = superside
+target = dev
+
+# ########################################### #
+# sqlfluff fix UNCOMPATIBLE commands
+# Won't be fixed when running that command
+# Just going to be flagged by the linter
+# ########################################### #
+
+# Layout configuration
+# See https://docs.sqlfluff.com/en/stable/layout.html#configuring-layout-and-spacing
+[sqlfluff:layout:type:comma]
+# Correct form:
+# SELECT
+#   a
+#   , b
+#
+# Flagged:
+# SELECT
+#   a,
+#   b
+line_position = leading
+
+[sqlfluff:rules:layout.long_lines]
+ignore_comment_clauses = True
+ignore_comment_lines = True
+
+[sqlfluff:rules:aliasing.column]
+# Pass: my_column AS mc
+# Flagged: my_column mc
+aliasing = explicit
+
+[sqlfluff:rules:aliasing.length]
+# Pass: my_column AS mc
+# Flagged: my_column AS m
+min_alias_length = 2
+
+
+# ########################################### #
+# sqlfluff fix COMPATIBLE commands
+# Will be fixed when running that command
+# ########################################### #
+
+[sqlfluff:indentation]
+# See https://docs.sqlfluff.com/en/stable/layout.html#configuring-indent-locations
+indented_using_on = True
+indented_on_contents = True
+allow_implicit_indents = True
+
+[sqlfluff:convention:casting_style]
+preferred_type_casting_style = 'shorthand'
+
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = upper
+
+[sqlfluff:rules:capitalisation.identifiers]
+capitalisation_policy = upper
+
+[sqlfluff:rules:capitalisation.functions]
+extended_capitalisation_policy = upper
+
+[sqlfluff:rules:capitalisation.literals]
+capitalisation_policy = upper
+
+[sqlfluff:rules:capitalisation.types]
+extended_capitalisation_policy = lower
+
+[sqlfluff:rules:aliasing.table]
+# Correct form: FROM my_table AS mt
+# Incorrect form: FROM my_table mt
+aliasing = explicit
+
+[sqlfluff:rules:references.keywords]
+ignore_words = cost,value,name,uuid,state,source,region,module,content,id,comment
