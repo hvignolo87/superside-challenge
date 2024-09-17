@@ -92,7 +92,7 @@ serviceAccount:
   annotations: {}
   name: *service-account-name
 
-version: "0.50.44"
+version: "0.50.50"
 
 ## @section Webapp Parameters
 
