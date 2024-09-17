@@ -7,15 +7,6 @@ jobs:
     name: Code quality check
     runs-on: ubuntu-24.04
     container: python:3.10.12
-    services:
-      postgres:
-        image: postgres:14.7-alpine
-        env:
-          POSTGRES_HOST: postgres
-          POSTGRES_PORT: 5432
-          POSTGRES_USER: warehouse
-          POSTGRES_PASSWORD: warehouse
-          POSTGRES_DB: warehouse
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
