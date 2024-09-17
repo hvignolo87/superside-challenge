@@ -1,0 +1,42 @@
+name: Code quality check
+
+on: push
+
+jobs:
+  lint:
+    name: Code quality check
+    runs-on: [ubuntu]
+    needs: prepare_commons
+    container: python:3.10.12
+    services:
+      postgres:
+        image: ${{ needs.prepare_commons.outputs.postgres_image }}
+        env:
+          POSTGRES_HOST: postgres
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: warehouse
+          POSTGRES_PASSWORD: warehouse
+          POSTGRES_DB: warehouse
+    steps:
+      # - name: Add SSH key
+      #   uses: webfactory/ssh-agent@v0.7.0
+      #   with:
+      #     ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v3
+
+      - name: Cache nox and deps
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            .cache/pip
+            .nox/hooks
+          key: nox-hooks-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: nox-hooks-
+
+      - name: Install nox
+        run: pip install nox
+
+      - name: Code quality check
+        run: nox --session hooks
