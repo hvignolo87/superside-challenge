@@ -9,7 +9,7 @@ jobs:
     container: python:3.10.12
     services:
       postgres:
-        image: ${{ needs.prepare_commons.outputs.postgres_image }}
+        image: postgres:14.7-alpine
         env:
           POSTGRES_HOST: postgres
           POSTGRES_PORT: 5432
