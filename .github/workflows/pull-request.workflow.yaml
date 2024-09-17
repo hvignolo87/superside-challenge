@@ -5,7 +5,7 @@ on: push
 jobs:
   lint:
     name: Code quality check
-    runs-on: [ubuntu]
+    runs-on: ubuntu-24.04
     container: python:3.10.12
     services:
       postgres:
