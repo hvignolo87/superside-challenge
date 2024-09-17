@@ -152,12 +152,23 @@ cluster-start: ## Start the stopped k3d cluster
 .PHONY: cluster-install-apps
 cluster-install-apps: set-k3d-context ## Install the required apps in the k8s cluster
 	$(call log, Installing apps in the k8s cluster...)
-	cd infra && terraform init && terraform apply -auto-approve
+	cd infra && \
+	terraform init && \
+	terraform apply -auto-approve -target="helm_release.airbyte" -target="helm_release.airflow"
 
 .PHONY: cluster-uninstall-apps
 cluster-uninstall-apps: set-k3d-context ## Uninstall the required apps in the k8s cluster
 	$(call log, Uninstalling apps in the k8s cluster...)
 	cd infra && terraform init && terraform destroy -auto-approve
+
+.PHONY: cluster-setup-airbyte
+cluster-setup-airbyte: set-k3d-context ## Setup the Airbyte workspace with sources and destinations
+	cd infra && \
+	terraform init && \
+	terraform apply -auto-approve \
+		-target="airbyte_source_postgres.clients_db" \
+		-target="airbyte_destination_postgres.warehouse" \
+		-target="airbyte_connection.clients_connection"
 
 .PHONY: cluster-local-image
 cluster-local-image: ## Push the local image to the local registry
@@ -192,7 +203,7 @@ stop: ## Stop docker-defined services, can be passed specific service(s) to only
 .PHONY: down
 down: ## Delete docker-defined services, can be passed specific service(s) to only delete those. Usage: make down services="warehouse"
 	$(call log, Deleting services $(services)...)
-	${DOCKER_COMPOSE_CMD} down $(services)
+	${DOCKER_COMPOSE_CMD} down -v $(services)
 
 .PHONY: clean
 clean: down ## Delete containers and volumes
