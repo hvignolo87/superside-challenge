@@ -35,7 +35,7 @@ jobs:
           apt-get update && apt-get install --no-install-recommends --no-install-suggests -y git
           pip install -U pip
           curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.6.1 python3 -
-          export PATH="/root/.local/bin:$PATH"
+          echo "/root/.local/bin" >> ${GITHUB_PATH}
           poetry config virtualenvs.in-project true
           poetry install --no-interaction --only dev
 
