@@ -21,11 +21,15 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     curl -sSL https://install.python-poetry.org | POETRY_VERSION=${POETRY_VERSION} python3 - && \
     poetry config virtualenvs.create false
 
-COPY . .
+COPY pyproject.toml poetry.lock ./
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=cache,target=/root/.cache/pypoetry \
     poetry install --no-interaction --all-extras --sync --without dev
+
+COPY ./dags ./dags
+
+COPY ./dbt ./dbt
 
 WORKDIR /opt/airflow/dbt/superside
 
