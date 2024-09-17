@@ -20,7 +20,7 @@ def hooks(session: nox.Session) -> None:
     """
     session.install(f"poetry=={POETRY_VERSION}")
     session.run("poetry", "install", "--no-interaction", "--only", "dev")
-    session.run("poetry", "run", "pre-commit", "install")
+    session.run("poetry", "run", "pre-commit", "install", "--install-hooks")
 
     session.run(
         "poetry",

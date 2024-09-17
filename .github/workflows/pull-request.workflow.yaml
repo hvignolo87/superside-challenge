@@ -20,7 +20,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Cache nox and deps
+      - name: Cache nox environment
         id: cached-poetry-dependencies
         uses: actions/cache@v3
         with:
@@ -30,8 +30,15 @@ jobs:
           key: nox-hooks-${{ hashFiles('**/poetry.lock') }}
           restore-keys: nox-hooks-
 
-      - name: Install nox
-        run: pip install nox
+      - name: Install development dependencies
+        run: |
+          apt-get update && apt-get install --no-install-recommends --no-install-suggests git
+          pip install -U pip
+          curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.6.1 python3 -
+          export PATH="/root/.local/bin:$PATH"
+          poetry config virtualenvs.in-project true
+          poetry install --no-interaction --only dev
 
       - name: Code quality check
-        run: nox --session hooks
+        run: |
+          poetry run nox --session hooks
