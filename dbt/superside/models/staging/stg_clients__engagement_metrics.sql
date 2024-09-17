@@ -1,7 +1,7 @@
 WITH raw_data AS (
     SELECT
-        project_id
-        , engagement_id
+        project_id::uuid
+        , engagement_id::uuid
         , customer_id
         , LOWER(customer_name) AS customer_name
         , engagement_date
@@ -12,7 +12,7 @@ WITH raw_data AS (
         , engagement_type
         , employee_count
         , comments
-        , project_ref
+        , project_ref::uuid
         , engagement_reference
         , client_revenue
         , service_type

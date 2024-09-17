@@ -10,10 +10,10 @@ sources:
         description: ""
         columns:
             - name: project_id
-              data_type: uuid
+              data_type: character varying
               description: ""
             - name: engagement_id
-              data_type: uuid
+              data_type: character varying
               description: ""
             - name: customer_id
               data_type: character varying
@@ -46,7 +46,7 @@ sources:
               data_type: character varying
               description: ""
             - name: project_ref
-              data_type: uuid
+              data_type: character varying
               description: ""
             - name: engagement_reference
               data_type: character varying
