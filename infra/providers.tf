@@ -18,11 +18,7 @@ provider "helm" {
 }
 
 provider "airbyte" {
-  // If running locally (Airbyte OSS) with docker-compose using the airbyte-proxy,
-  // include the actual password/username you've set up (or use the defaults below)
-  password = "password"
-  username = "airbyte"
-
-  // if running locally (Airbyte OSS)
+  username   = "airbyte"
+  password   = "airbyte"
   server_url = "http://localhost:8001/api/public/v1/"
 }
