@@ -9,7 +9,7 @@ repos:
         stages: [commit]
 
       - id: trailing-whitespace
-        name: ✂️  trailing-whitespace
+        name: ✂️ trailing-whitespace
         entry: poetry run trailing-whitespace-fixer
         language: system
         types_or: [dotenv, gitignore, makefile, markdown, plain-text, python, sh, terraform, text, toml, yaml]
@@ -24,21 +24,21 @@ repos:
         stages: [commit]
 
       - id: detect-aws-credentials
-        name: ☁️​  detect-aws-credentials
+        name: ☁️​ detect-aws-credentials
         entry: poetry run detect-aws-credentials
         language: system
         types_or: [dotenv, gitignore, makefile, markdown, plain-text, python, sh, terraform, text, toml, yaml]
         stages: [commit]
 
       - id: check-yaml
-        name: 🕵️‍♂️​  check-yaml
+        name: 🕵️‍♂️​ check-yaml
         entry: poetry run check-yaml
         language: system
         types: [yaml]
         stages: [commit]
 
       - id: black
-        name: ♟️  black
+        name: ♟️ black
         entry: poetry run black
         language: system
         types: [python]
