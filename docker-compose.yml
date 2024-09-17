@@ -53,22 +53,45 @@ services:
       interval: 5s
       retries: 5
 
+  clients-db:
+    image: postgres:${CLIENTS_POSTGRES_VERSION:-14.7}
+    container_name: clients-db
+    hostname: clients-db
+    volumes:
+      - clients-volume:/var/lib/postgresql/data
+      - ./scripts/clients_postgres_init.sh:/docker-entrypoint-initdb.d/postgres_init.sh
+      - ./source_data/engagement_metrics_raw.csv:/docker-entrypoint-initdb.d/source_data/engagement_metrics_raw.csv
+    environment:
+      - POSTGRES_USER=${CLIENTS_POSTGRES_USER:-clients}
+      - POSTGRES_PASSWORD=${CLIENTS_POSTGRES_PASSWORD:-clients}
+      - POSTGRES_DB=${CLIENTS_POSTGRES_DB:-clients}
+      - POSTGRES_PORT=${CLIENTS_POSTGRES_PORT:-5432}
+    ports:
+      - ${CLIENTS_POSTGRES_PORT_HOST:-5460}:${CLIENTS_POSTGRES_PORT:-5432}
+    restart: on-failure
+    networks:
+      superside:
+        aliases:
+          - clients-db
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${CLIENTS_POSTGRES_USER:-clients}"]
+      interval: 5s
+      retries: 5
+
   warehouse:
     image: postgres:${WAREHOUSE_POSTGRES_VERSION:-14.7}
     container_name: warehouse
     hostname: warehouse
     volumes:
       - warehouse-volume:/var/lib/postgresql/data
-      - ./scripts/postgres_init.sh:/docker-entrypoint-initdb.d/postgres_init.sh
-      - ./source_data/engagement_metrics_raw.csv:/docker-entrypoint-initdb.d/source_data/engagement_metrics_raw.csv
-      - ./source_data/dim_project.csv:/docker-entrypoint-initdb.d/source_data/dim_project.csv
+      - ./scripts/warehouse_postgres_init.sh:/docker-entrypoint-initdb.d/postgres_init.sh
     environment:
       - POSTGRES_USER=${WAREHOUSE_POSTGRES_USER:-warehouse}
       - POSTGRES_PASSWORD=${WAREHOUSE_POSTGRES_PASSWORD:-warehouse}
       - POSTGRES_DB=${WAREHOUSE_POSTGRES_DB:-warehouse}
       - POSTGRES_PORT=${WAREHOUSE_POSTGRES_PORT:-5432}
     ports:
-      - ${WAREHOUSE_POSTGRES_PORT_HOST:-5460}:${WAREHOUSE_POSTGRES_PORT:-5432}
+      - ${WAREHOUSE_POSTGRES_PORT_HOST:-5470}:${WAREHOUSE_POSTGRES_PORT:-5432}
     restart: on-failure
     networks:
       superside:
@@ -97,6 +120,7 @@ services:
 volumes:
   airbyte-db-volume:
   airflow-db-volume:
+  clients-volume:
   warehouse-volume:
   registry:
 
