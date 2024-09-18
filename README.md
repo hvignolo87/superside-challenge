@@ -147,31 +147,33 @@ The selected data stack is as follows:
 
 Airbyte and Airflow are installed in the kubernetes cluster via helm through its terraform providers.
 
+This is a simplified diagram of the architecture:
+
 <p align="center">
   <img src="./images/cluster.png" alt="cluster" style="vertical-align:middle">
 </p>
 
 ### Container orchestration
 
-Each platform runs in its own node and has its namespace. The nodes are labeled with the `component: [platform]` label, where `platform` can be either `airbyte` or `airflow`. Then, the `nodeSelector` property is set to `component: [platform]` in each platform's values files.
+Each platform runs in its own node and namespace. These nodes are labeled with the `component: [platform]` label, where `platform` can be either `airbyte` or `airflow`. Then, the `nodeSelector` property is set to `component: [platform]` in each platform's values files.
 
 Both platforms will run its jobs in ephemeral pods, which will be scheduled in a third node with label `component: jobs`. This is convenient for these reasons:
 
 - If using a node provisioner like [karpenter](https://karpenter.sh/), this architectue allows to provide ephemeral nodes just to run this workloads an then remove them, saving costs.
-- As the pods runs in an isolated environment, any kind of disruption won't affect the other platform's components.
-- The nodes resources, requests, and limits can be managed separately
+- As the pods runs in isolated environments, any kind of disruption won't affect the other platform's components.
+- The nodes and its pods' resources, requests, and limits can be managed separately
 - The ephemeral pods' resources can be modified through Airflow variables, as I've used the [kubernetesPodOperator](https://airflow.apache.org/docs/apache-airflow-providers-cncf-kubernetes/stable/operators.html#kubernetespodoperator) in the transformations DAG, making it easier to manage them
 
 ### Data flow
 
 The data flow is as follows (the provided raw data is in the `source_data` directory):
 
-1. The raw `engagement_metrics_raw.csv` is loaded into the `clients` DB through the `scripts/clients_postgres_init.sh` script. This DB is considered as a source.
-    - This was done to better emulate a production environment, and to allow me to use Airbyte, because I would need [these credentials](https://docs.airbyte.com/integrations/sources/google-sheets#prerequisites) that I don't have.
-2. Once Airbyte runs its sync, the raw data is moved to the `warehouse` DB, which is the destination. You'll find the data in the `clients.engagement_metrics` landing table
+1. The raw `engagement_metrics_raw.csv` data is loaded into the `clients` DB through the `scripts/clients_postgres_init.sh` script. This DB is considered as a source.
+    - This was done to better emulate a production environment, and to allow me to use Airbyte, because otherwise I would need [these credentials](https://docs.airbyte.com/integrations/sources/google-sheets#prerequisites) which I don't have, in order to sync the data directly from the Google Sheets.
+2. Once Airbyte runs its sync, the raw data is moved to the `warehouse` DB, which is the destination. You'll find the data in the `clients.engagement_metrics` landing table.
 3. Then, Airflow triggers the dbt transformations, and the models are materialized in the `warehouse` DB, in separate schemas:
     - `staging`: materialized as a view, where simple casting and renaming is done, and has a 1-1 relation with the landing table.
-    - `intermediate`: materialized as a view, where more complex transformations are done to normalize an prepare data for downstream consumption.
+    - `intermediate`: materialized as a view, where more complex transformations are done to normalize and prepare data for downstream consumption.
     - `marts`: materialized as a table, where the `dim_project.csv` data is loaded as a seed, and then joined with the `fct_engagement_metrics` table in a model named `engagement_metrics`.
 
 ## Setup
@@ -255,7 +257,7 @@ You can do this manually with Lens, or by running:
 ```bash
 kubectl port-forward -n airbyte svc/airbyte-web 8085:8080
 kubectl port-forward -n airbyte svc/airbyte-api 8001:8001
-kubectl port-forward -n airflow svc/airbyte-webserver 8090:8000
+kubectl port-forward -n airflow svc/airbyte-webserver 8090:8080
 ```
 
 Verify that you can access the web servers by going to `http://localhost:8085` and `http://localhost:8090`.
@@ -317,6 +319,8 @@ The run:
 ```sql
 SELECT * FROM marts.engagement_metrics;
 ```
+
+Please go ahead and check the tables and views in the others schemas.
 
 ## Data exploration
 
