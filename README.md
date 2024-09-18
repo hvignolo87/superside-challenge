@@ -140,10 +140,12 @@ The selected data stack is as follows:
 
 - [Airbyte](https://airbyte.com/) for data movement
 - [Airflow](https://airflow.apache.org/) for workflow orchestration
+  - The Airflow cluster is deployed with the `CeleryExecutor` and a Redis database working as a message broker between Celery and the worker.
 - [dbt](https://docs.getdbt.com/) for data modeling
   - The Airflow and dbt integration was made through [cosmos](https://astronomer.github.io/astronomer-cosmos/)
 - [Postgres](https://www.postgresql.org/) for data storage
   - This DB was selected just for simplicity
+- A local [registry](https://registry.hub.docker.com/_/registry/) for storing and distributing container images
 
 Airbyte and Airflow are installed in the kubernetes cluster via helm through its terraform providers.
 
@@ -178,7 +180,9 @@ The data flow is as follows (the provided raw data is in the `source_data` direc
 
 ## Setup
 
-Let's dive into the setup process.
+Before you begin, please disconnect any VPN you might be connected to, if any.
+
+Please, take into account that the whole process will take at least 30 minutes, depending if you have previously pulled the Docker images, and your internet connectivity.
 
 ### 1. Generate the environment variables
 
@@ -234,7 +238,7 @@ docker ps
 
 ### 4. Deploy the platforms
 
-> Each time you run any command related to the cluster, the current context is switched the local cluster, to avoid any conflicts with another one you may have in your `~/.kube/config` file.
+> Each time you run any command related to the cluster through a make rule, the current context is switched to the local cluster, to avoid any conflicts with other ones you may have in your `~/.kube/config` file.
 
 To deploy Airbyte and Airflow in the cluster, run:
 
@@ -242,11 +246,11 @@ To deploy Airbyte and Airflow in the cluster, run:
 make cluster-install-apps
 ```
 
-This will take a while, you can monitor the state same as before.
+This will take a while (10-15 minutes, depending on your machine), but you can monitor the state the same way you did before.
 
 ### 5. Setup Airbyte
 
-Go ahead an port-forward the following services to these local ports (verify that you aren't using them already):
+Go ahead and port-forward the following services to these local ports (verify that you aren't using them already):
 
 - Airbyte web server: 8085
 - Airbyte API server: 8001
@@ -255,12 +259,10 @@ Go ahead an port-forward the following services to these local ports (verify tha
 You can do this manually with Lens, or by running:
 
 ```bash
-kubectl port-forward -n airbyte svc/airbyte-web 8085:8080
-kubectl port-forward -n airbyte svc/airbyte-api 8001:8001
-kubectl port-forward -n airflow svc/airbyte-webserver 8090:8080
+make cluster-port-forward
 ```
 
-Verify that you can access the web servers by going to `http://localhost:8085` and `http://localhost:8090`.
+Verify that you can access the web servers by going to [http://localhost:8085](http://localhost:8085) and [http://localhost:8090](http://localhost:8090).
 
 Then, please complete the Airbyte's initial setup.
 
@@ -286,11 +288,21 @@ Then, please fill the `workspace_id` in the `infra/variables.tf` file and run:
 make cluster-setup-airbyte
 ```
 
-Wait a minute and go to the Airbyte's connections, you'll see a new one named `Clients`. Please trigger a sync manually and wait until it finishes.
+This will trigger some Airbyte jobs that will run in some pods, so it will take a while to complete (around 5 minutes).
+
+Once finished, go to the Airbyte's connections, and you'll see a new one named `Clients`. Please trigger a sync manually and wait until it finishes (around 5-10 minutes).
 
 ### 6. Run the dbt models with Airflow
 
-Go to `http://localhost:8090` and unpause the `transformations` DAG. You should see how the dbt models are running in ephemeral pods. Please check this with Lens, or by running:
+As the dbt models will run in ephemeral pods via the [kubernetesPodOperator](https://airflow.apache.org/docs/apache-airflow-providers-cncf-kubernetes/stable/operators.html#kubernetespodoperator), you'll need to provide an image to the containers. To do this, please run:
+
+```bash
+make cluster-local-image
+```
+
+Go to [http://localhost:8090](http://localhost:8090), and login with the default credentials `airflow:airflow`.
+
+Then, unpause the `transformations` DAG. You should see how the dbt models are running in the ephemeral pods (scheduled in the node with label `component=jobs`). Please check this with Lens, or by running:
 
 ```bash
 watch -d kubectl get pods \
@@ -302,7 +314,7 @@ watch -d kubectl get pods \
     )
 ```
 
-Then, wait 1-2 minutes until the models run.
+Then, wait around 2 minutes until the models run.
 
 ### 7. Check the results in the warehouse
 
@@ -317,7 +329,7 @@ Open your SQL client and connect to the warehouse. These are the credentials:
 The run:
 
 ```sql
-SELECT * FROM marts.engagement_metrics;
+SELECT * FROM marts.project_engagement;
 ```
 
 Please go ahead and check the tables and views in the others schemas.
