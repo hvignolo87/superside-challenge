@@ -25,7 +25,7 @@ COPY pyproject.toml poetry.lock ./
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=cache,target=/root/.cache/pypoetry \
-    poetry install --no-interaction --all-extras --sync --without dev
+    poetry install --no-interaction --all-extras --sync --without dev,docs
 
 COPY ./dags ./dags
 

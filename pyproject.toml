@@ -48,6 +48,10 @@ types-pytz = "^2023.3.1.1"
 types-pyyaml = "^6.0.12.12"
 types-requests = "2.31"
 
+
+[tool.poetry.group.docs.dependencies]
+diagrams = "^0.23.4"
+
 [tool.ruff]
 extend-exclude = [".airflowignore", "__pycache__"]
 extend-select = ["AIR", "B", "D", "I", "N", "PL", "Q"]

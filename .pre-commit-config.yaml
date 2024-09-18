@@ -62,6 +62,7 @@ repos:
       - id: interrogate
         name: 🔎 interrogate
         entry: poetry run interrogate
+        exclude: ^diagrams/
         language: system
         types: [python]
         stages: [commit]
