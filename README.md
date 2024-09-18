@@ -368,7 +368,7 @@ Because of this, I've decided to deduplicate with the `ROW_NUMBER()` window func
 
 All these transformations happen in the intermediate layer.
 
-After exploring the data further I noticed is that the dates are in various formats, and that is another issue that needs to be fixed.
+After further exploring the data, I noticed that the dates are in various formats, which is another issue that needs to be fixed.
 
 Something similar happened with the names of the clients. They had typos, which were fixed.
 
@@ -378,7 +378,7 @@ All the columns associated with monetary values ​​had the same problem. In a
 
 #### Levenshtein distance
 
-The most interesting part was that almost all columns seem to contain some categories, but these contain spelling errors in different positions. To fix this issue in a cleaner way, I've used the [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance).
+The most interesting part was that almost all columns seem to contain some categories, but these contain spelling errors in different positions. To fix this issue more cleanly, I've used the [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance).
 
 As dbt doesn't provide an out-of-the-box package or method for this, I've installed the [fuzzystrmatch](https://www.postgresql.org/docs/14/fuzzystrmatch.html#id-1.11.7.24.7) extension in the `warehouse`.
 
@@ -390,11 +390,11 @@ As all this logic was the same for almost all the columns, I've encapsulated it 
 
 ### Relationships
 
-I checked that all the values in the `warehouse.clients.engagement_metrics.project_id` column corresponds to a value in the `warehouse.marts.dim_project.project_id` column. On the other hand, if I use this criteria to join them, some values looks odd. For example, in some cases, the `engagement_date` was greater than the `date_project_ended` column, which is confusing.
+I checked that all the values in the `warehouse.clients.engagement_metrics.project_id` column corresponds to a value in the `warehouse.marts.dim_project.project_id` column. On the other hand, if I use this criterion to join them, some values look odd. For example, in some cases, the `engagement_date` was greater than the `date_project_ended` column, which is confusing.
 
 Another thing that I found is that, in the joined table, the `customer_id` differs from the one in the `dim_project` column. If I add this condition to the join statement, it happens that only ~90 rows match it. This also seemed weird to me, so I left it without this condition.
 
-After further analysis I wasn't able to ensure if there's a problem with the data or if I'm missing something, so I decided to join just for `project_id`.
+After further analysis, I wasn't able to determine if there was a problem with the data or if I was missing something, so I decided to join just for `project_id`.
 
 ## CI Pipeline
 
