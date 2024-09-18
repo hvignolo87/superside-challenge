@@ -177,6 +177,12 @@ cluster-local-image: ## Push the local image to the local registry
 	docker image tag ${PROJECT_NAME}:latest localhost:${REGISTRY_PORT_HOST}/${PROJECT_NAME}:latest && \
 	docker push localhost:${REGISTRY_PORT_HOST}/${PROJECT_NAME}:latest
 
+.PHONY: cluster-port-forward
+cluster-port-forward: set-k3d-context ## Port forward the Airbyte and Airflow services to the local machine
+	kubectl port-forward -n airbyte svc/airbyte-airbyte-webapp-svc 8085:80 & \
+	kubectl port-forward -n airbyte svc/airbyte-airbyte-server-svc 8001:8001 & \
+	kubectl port-forward -n airflow svc/airflow-web 8090:8080
+
 
 ##@ Docker
 
