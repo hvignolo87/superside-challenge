@@ -28,6 +28,7 @@ vars:
   service_categories: ['Consulting', 'Design', 'Development', 'Support']
   sub_service_categories: ['Backend', 'Frontend', 'UX/UI', 'Customer Service', 'Strategy']
   engagement_type_categories: ['Recurring', 'One-time', 'New']
+  dbt_date:time_zone: 'America/Los_Angeles'
 
 models:
   superside:
