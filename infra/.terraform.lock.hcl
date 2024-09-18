@@ -25,7 +25,8 @@ provider "registry.terraform.io/airbytehq/airbyte" {
 }
 
 provider "registry.terraform.io/hashicorp/helm" {
-  version = "2.15.0"
+  version     = "2.15.0"
+  constraints = "2.15.0"
   hashes = [
     "h1:VymvscRkDy0+zN2uKpKYY6njXPY8JROARuaL3VPsEos=",
     "zh:18b94c7c83c30ad166722a61a412e3de6a67935772960e79aaa24c15f8ea0d0f",
