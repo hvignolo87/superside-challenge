@@ -290,7 +290,7 @@ make cluster-setup-airbyte
 
 This will trigger some Airbyte jobs that will run in some pods, so it will take a while to complete (around 5 minutes).
 
-Once finished, go to the Airbyte's connections, and you'll see a new one named `Clients`. Please trigger a sync manually and wait until it finishes (around 5-10 minutes).
+Once finished, go to the Airbyte's connections, and you'll see a new one named `Clients`. Please trigger a sync manually and wait until it finishes (around 5-10 minutes). You can trigger the sync as many times as you want, since the sync mode is [Full Refresh | Overwrite](https://docs.airbyte.com/using-airbyte/core-concepts/sync-modes/full-refresh-overwrite).
 
 ### 6. Run the dbt models with Airflow
 
@@ -337,3 +337,47 @@ Please go ahead and check the tables and views in the others schemas.
 ## Data exploration
 
 Explanations here
+
+## CI Pipeline
+
+I've deployed a simple CI pipeline to run the pre-commit hooks in a Github runner. Pleas go ahead and check the workflow file.
+
+## More commands and help
+
+If you're struggling with some commands, please run `make help` to get all the available commands.
+
+<p align="center">
+  <img src="./images/make.png" alt="make" style="vertical-align:middle">
+</p>
+
+## About the development tools
+
+I've used [poetry](https://python-poetry.org/) to manage the project's dependencies. If you want to install it in your local machine, please run:
+
+```bash
+make install-poetry
+```
+
+And then run:
+
+```bash
+make install-project
+```
+
+Then you'll have all the dependencies installed, and a virtual environment created in this very directory. This is useful, for example, if you're using VS Code and want to explore the code. Also, you might want to use [pyenv](https://github.com/pyenv/pyenv) to install Python 3.10.12.
+
+All the code in this project has been linted and formatted with these tools:
+
+- [black](https://black.readthedocs.io/en/stable/)
+- [isort](https://pycqa.github.io/isort/)
+- [mypy](https://mypy.readthedocs.io/en/stable/)
+- [ruff](https://docs.astral.sh/ruff/)
+- [sqlfluff](https://docs.astral.sh/sqlfluff/)
+
+Just cloned the repo and want to play around with the pre-commit framework? Then run:
+
+```bash
+make nox-hooks
+```
+
+Curious about nox? Check out the [nox docs](https://nox.thea.codes/en/stable/usage.html).
