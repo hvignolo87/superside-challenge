@@ -147,7 +147,9 @@ The selected data stack is as follows:
 
 Airbyte and Airflow are installed in the kubernetes cluster via helm through its terraform providers.
 
-<img src="./images/cluster.png" alt="cluster" style="vertical-align:middle">
+<p align="center">
+  <img src="./images/cluster.png" alt="cluster" style="vertical-align:middle">
+</p>
 
 ### Container orchestration
 
@@ -260,11 +262,15 @@ Verify that you can access the web servers by going to `http://localhost:8085` a
 
 Then, please complete the Airbyte's initial setup.
 
-<img src="./images/airbyte_ui.png" alt="airbyte_ui" style="vertical-align:middle">
+<p align="center">
+  <img src="./images/airbyte_ui.png" alt="airbyte_ui" style="vertical-align:middle">
+</p>
 
 Once done, please copy the workspace id from the Airbyte UI.
 
-<img src="./images/workspace.png" alt="workspace" style="vertical-align:middle">
+<p align="center">
+  <img src="./images/workspace.png" alt="workspace" style="vertical-align:middle">
+<p>
 
 Or by running:
 
