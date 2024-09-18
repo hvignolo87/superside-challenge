@@ -222,24 +222,6 @@ prune: ## Delete everything in docker
 	docker system prune --all --volumes --force && docker volume prune --all --force
 
 
-##@ Airflow
-
-.PHONY: airflow-shell
-airflow-shell: ## Open a shell inside the Airflow scheduler. Usage: make airflow-shell
-	$(call log, Opening Airflow shell in the scheduler...)
-	$(DOCKER_COMPOSE_CMD) exec airflow-scheduler /bin/bash
-
-.PHONY: airflow-tasks-test
-airflow-tasks-test: ## Tests an Airflow task. Usage: make airflow-tasks-test dag="etl" task="obt_sourcing_rs" args="20231005"
-	$(call log, Testing the task $(task) in the DAG $(dag) in Airflow...)
-	$(DOCKER_COMPOSE_CMD) exec airflow-scheduler airflow tasks test $(dag) $(task) $(args)
-
-.PHONY: airflow-conn-test
-airflow-conn-test: ## Tests an Airflow connection. Usage: make airflow-conn-test id="postgres_warehouse"
-	$(call log, Testing the connection $(id) in Airflow...)
-	$(DOCKER_COMPOSE_CMD) exec airflow-scheduler airflow connections test $(id)
-
-
 ##@ dbt
 
 .PHONY: dbt-run-model
@@ -304,7 +286,7 @@ dbt-docs-serve: ## Serve the documentation website for the dbt project. Usage: m
 	poetry run dbt docs serve --project-dir dbt/${PROJECT_NAME} --profiles-dir dbt/${PROJECT_NAME} --browser --port $(port)
 
 .PHONY: dbt-gen-source-yaml
-dbt-gen-source-yaml: ## Generate lightweight YAML for sources. Usage: make dbt-gen-source-yaml db="warehouse" schema="cbo"
+dbt-gen-source-yaml: ## Generate lightweight YAML for sources. Usage: make dbt-gen-source-yaml db="warehouse" schema="clients"
 	$(call log, Generating sources for $(db).$(schema)...)
 	poetry run dbt run-operation generate_source --project-dir dbt/${PROJECT_NAME} --profiles-dir dbt/${PROJECT_NAME} --args \
 		'{ \
@@ -318,7 +300,7 @@ dbt-gen-source-yaml: ## Generate lightweight YAML for sources. Usage: make dbt-g
 		}'
 
 .PHONY: dbt-gen-model-yaml
-dbt-gen-model-yaml: ## Generate YAML for models. Usage: make dbt-gen-model-yaml model='["applications", "user_links"]'
+dbt-gen-model-yaml: ## Generate YAML for models. Usage: make dbt-gen-model-yaml model='["int_engagement_metrics", "project_engagement"]'
 	$(call log, Generating models for $(model)...)
 	poetry run dbt run-operation generate_model_yaml $(target) --project-dir dbt/${PROJECT_NAME} --profiles-dir dbt/${PROJECT_NAME} --args \
 		'{ \
