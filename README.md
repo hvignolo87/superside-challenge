@@ -336,7 +336,65 @@ Please go ahead and check the tables and views in the others schemas.
 
 ## Data exploration
 
-Explanations here
+Before start building the models, I've explored the raw data to understand its nature and relation with the `dim_project` (which I verified is in a clean format, ready to be consumed as is). To do this, I loaded the raw data in a source table in the `Clients` DB, `engagement_metrics` table.
+
+Some things that came up from the analysis are:
+
+### Presence of duplicates
+
+I realized that the table's unique key is `(project_id, engagement_id)`:
+
+<p align="center">
+  <img src="./images/uk.png" alt="uk" style="vertical-align:middle">
+</p>
+
+I check these 2 cases with this query:
+
+```sql
+SELECT *
+FROM engagement_metrics
+WHERE project_id IN ('0bf50700-a93a-4e7d-8a04-30a6116acbeb', 'e34525ca-b73d-41b0-8e83-4ba9e983555d')
+    AND engagement_id IN ('035ae529-0ace-4a6b-b0bf-95c85ff5af03', '11089782-22e7-43fd-8ace-221538ea812a')
+```
+
+And realized that:
+
+- The row with `customer_name = 'Customer_305'` is duplicated, since all its columns has the same values.
+- The row with `customer_name = 'Customer_561'` has all its columns with the same values, except for the `service`, which differs between `Consulting` and `Design`, and `Strateby` and `Frontend` in the sub_service column.
+
+Because of this, I've decided to deduplicate with the `ROW_NUMBER()` window function, because both cases seems duplicates to me.
+
+### Data normalization
+
+All these transformations happen in the intermediate layer.
+
+After exploring the data further I noticed is that the dates are in various formats, and that is another issue that needs to be fixed.
+
+Something similar happened with the names of the clients. They had typos, which were fixed.
+
+On the other hand, the `employee_count` column contained numbers but in 2 cases it contained the words `fifty` and `hundred`, so they were replaced by their associated numbers.
+
+All the columns associated with monetary values ​​had the same problem. In addition to the number, they contained the currency symbol, and in some cases the suffix `k`. I assumed that all currencies were the same, and that `k` meant 10<sup>3</sup>, so I adjusted the data accordingly.
+
+#### Levenshtein distance
+
+The most interesting part was that almost all columns seem to contain some categories, but these contain spelling errors in different positions. To fix this issue in a cleaner way, I've used the [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance).
+
+As dbt doesn't provide an out-of-the-box package or method for this, I've installed the [fuzzystrmatch](https://www.postgresql.org/docs/14/fuzzystrmatch.html#id-1.11.7.24.7) extension in the `warehouse`.
+
+After some tests, I found that all the misspelled categories were within a Levenshtein distance of less than 2 from their correct categories.
+
+#### dbt macros
+
+As all this logic was the same for almost all the columns, I've encapsulated it some macros.
+
+### Relationships
+
+I checked that all the values in the `warehouse.clients.engagement_metrics.project_id` column corresponds to a value in the `warehouse.marts.dim_project.project_id` column. On the other hand, if I use this criteria to join them, some values looks odd. For example, in some cases, the `engagement_date` was greater than the `date_project_ended` column, which is confusing.
+
+Another thing that I found is that, in the joined table, the `customer_id` differs from the one in the `dim_project` column. If I add this condition to the join statement, it happens that only ~90 rows match it. This also seemed weird to me, so I left it without this condition.
+
+After further analysis I wasn't able to ensure if there's a problem with the data or if I'm missing something, so I decided to join just for `project_id`.
 
 ## CI Pipeline
 
