@@ -138,6 +138,8 @@ cluster-create: ## Build and start the required docker services and the k3d clus
 cluster-delete: ## Stop and delete the k3d cluster
 	k3d cluster delete ${PROJECT_NAME}
 	${DOCKER_COMPOSE_CMD} down -v
+	rm -f infra/terraform.tfstate
+	rm -f infra/terraform.tfstate.backup
 
 .PHONY: cluster-stop
 cluster-stop: ## Stop the k3d cluster
