@@ -48,7 +48,7 @@ DEFAULT_ARGS = {
         "T",
         "transformations",
     ],
-    schedule="0 6 * * *",
+    schedule="0 */6 * * *",
     start_date=datetime(2024, 1, 1),
     max_active_runs=1,
     max_active_tasks=10,
