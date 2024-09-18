@@ -77,7 +77,13 @@ This is the structure of the project.
 │       │   └── .gitkeep
 │       └── tests
 │           └── .gitkeep
+├── diagrams
+│   ├── airbyte.png
+│   ├── diagram.py
+│   └── kubernetes.png
 ├── docker-compose.yml
+├── images
+│   └── cluster.png
 ├── infra
 │   ├── .terraform.lock.hcl
 │   ├── airbyte-values.yml
@@ -98,7 +104,7 @@ This is the structure of the project.
     ├── dim_project.csv
     └── engagement_metrics_raw.csv
 
-23 directories, 60 files
+24 directories, 64 files
 ```
 
 ## What you'll need
@@ -133,13 +139,38 @@ There are other optional dependencies:
 The selected data stack is as follows:
 
 - [Airbyte](https://airbyte.com/) for data movement
-- [Airflow](https://airflow.apache.org/) for tasks orchestration
+- [Airflow](https://airflow.apache.org/) for workflow orchestration
 - [dbt](https://docs.getdbt.com/) for data modeling
+  - The Airflow and dbt integration was made through [cosmos](https://astronomer.github.io/astronomer-cosmos/)
 - [Postgres](https://www.postgresql.org/) for data storage
+  - This DB was selected just for simplicity
 
 Airbyte and Airflow are installed in the kubernetes cluster via helm through its terraform providers.
 
-<img src="./images/cluster.png" alt="cluster" style="vertical-align:middle"><br>
+<img src="./images/cluster.png" alt="cluster" style="vertical-align:middle">
+
+### Container orchestration
+
+Each platform runs in its own node and has its namespace. The nodes are labeled with the `component: [platform]` label, where `platform` can be either `airbyte` or `airflow`. Then, the `nodeSelector` property is set to `component: [platform]` in each platform's values files.
+
+Both platforms will run its jobs in ephemeral pods, which will be scheduled in a third node with label `component: jobs`. This is convenient for these reasons:
+
+- If using a node provisioner like [karpenter](https://karpenter.sh/), this architectue allows to provide ephemeral nodes just to run this workloads an then remove them, saving costs.
+- As the pods runs in an isolated environment, any kind of disruption won't affect the other platform's components.
+- The nodes resources, requests, and limits can be managed separately
+- The ephemeral pods' resources can be modified through Airflow variables, as I've used the [kubernetesPodOperator](https://airflow.apache.org/docs/apache-airflow-providers-cncf-kubernetes/stable/operators.html#kubernetespodoperator) in the transformations DAG, making it easier to manage them
+
+### Data flow
+
+The data flow is as follows (the provided raw data is in the `source_data` directory):
+
+1. The raw `engagement_metrics_raw.csv` is loaded into the `clients` DB through the `scripts/clients_postgres_init.sh` script. This DB is considered as a source.
+    - This was done to better emulate a production environment, and to allow me to use Airbyte, because I would need [these credentials](https://docs.airbyte.com/integrations/sources/google-sheets#prerequisites) that I don't have.
+2. Once Airbyte runs its sync, the raw data is moved to the `warehouse` DB, which is the destination. You'll find the data in the `clients.engagement_metrics` landing table
+3. Then, Airflow triggers the dbt transformations, and the models are materialized in the `warehouse` DB, in separate schemas:
+    - `staging`: materialized as a view, where simple casting and renaming is done, and has a 1-1 relation with the landing table.
+    - `intermediate`: materialized as a view, where more complex transformations are done to normalize an prepare data for downstream consumption.
+    - `marts`: materialized as a table, where the `dim_project.csv` data is loaded as a seed, and then joined with the `fct_engagement_metrics` table in a model named `engagement_metrics`.
 
 ## Setup
 
@@ -157,7 +188,7 @@ This will generate two `.env` files with predefined values. Please, go ahead and
 
 ### 2. Install the project dependencies
 
-Run these commands in this sequence:
+Run these commands in this sequence (beware if you've `poetry` already installed in your machine):
 
 ```bash
 make install-poetry
@@ -195,4 +226,88 @@ Also, this command creates some useful services which you can check that are run
 
 ```bash
 docker ps
+```
+
+### 4. Deploy the platforms
+
+> Each time you run any command related to the cluster, the current context is switched the local cluster, to avoid any conflicts with another one you may have in your `~/.kube/config` file.
+
+To deploy Airbyte and Airflow in the cluster, run:
+
+```bash
+make cluster-install-apps
+```
+
+This will take a while, you can monitor the state same as before.
+
+### 5. Setup Airbyte
+
+Go ahead an port-forward the following services to these local ports (verify that you aren't using them already):
+
+- Airbyte web server: 8085
+- Airbyte API server: 8001
+- Airflow web server: 8090
+
+You can do this manually with Lens, or by running:
+
+```bash
+kubectl port-forward -n airbyte svc/airbyte-web 8085:8080
+kubectl port-forward -n airbyte svc/airbyte-api 8001:8001
+kubectl port-forward -n airflow svc/airbyte-webserver 8090:8000
+```
+
+Verify that you can access the web servers by going to `http://localhost:8085` and `http://localhost:8090`.
+
+Then, please complete the Airbyte's initial setup.
+
+![airbyte_ui](./images/airbyte_ui.png)
+
+Once done, please copy the workspace id from the Airbyte UI.
+
+![workspace](./images/workspace.png)
+
+Or by running:
+
+```bash
+curl -u airbyte:airbyte http://localhost:8001/api/public/v1/workspaces
+```
+
+Then, please fill the `workspace_id` in the `infra/variables.tf` file and run:
+
+```bash
+make cluster-setup-airbyte
+```
+
+Wait a minute and go to the Airbyte's connections, you'll see a new one named `Clients`. Please trigger a sync manually and wait until it finishes.
+
+### 6. Run the dbt models with Airflow
+
+Go to `http://localhost:8090` and unpause the `transformations` DAG. You should see how the dbt models are running in ephemeral pods. Please check this with Lens, or by running:
+
+```bash
+watch -d kubectl get pods \
+  -n airflow \
+  --field-selector spec.nodeName=$(
+      kubectl get nodes \
+        -l component=jobs \
+        -o jsonpath='{.items[0].metadata.name}'
+    )
+```
+
+Then, wait 1-2 minutes until the models run.
+
+### 7. Check the results in the warehouse
+
+Open your SQL client and connect to the warehouse. These are the credentials:
+
+- User: `warehouse`
+- Password: `warehouse`
+- Database: `warehouse`
+- Host: `localhost`
+- Port: `5470`
+
+The run:
+
+```sql
+SELECT * FROM marts.engagement_metrics;
 ```
