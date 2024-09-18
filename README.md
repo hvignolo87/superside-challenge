@@ -314,7 +314,11 @@ watch -d kubectl get pods \
     )
 ```
 
-Then, wait around 2 minutes until the models run.
+Then, wait around 2 minutes until the models run. The DAG looks as follows:
+
+<p align="center">
+  <img src="./images/transformations.png" alt="transformations" style="vertical-align:middle">
+</p>
 
 ### 7. Check the results in the warehouse
 
@@ -394,7 +398,13 @@ I checked that all the values in the `warehouse.clients.engagement_metrics.proje
 
 Another thing that I found is that, in the joined table, the `customer_id` differs from the one in the `dim_project` column. If I add this condition to the join statement, it happens that only ~90 rows match it. This also seemed weird to me, so I left it without this condition.
 
-After further analysis, I wasn't able to determine if there was a problem with the data or if I was missing something, so I decided to join just for `project_id`.
+After further analysis, and as there were no source documentation provided, I wasn't able to determine if there was a problem with the data or if I was missing something, so I decided to join just for `project_id`.
+
+## Final comments and issues found
+
+I tried to enforce contracts both in staging and marts layer, but it turned out that dbt 1.5 [has a bug](https://github.com/dbt-labs/dbt-postgres/issues/54) with this feature when the data types are UUID.
+
+I have implemented tests to ensure unique keys, non-nullity, and categories in the intermediate and final models. I can implement more, but I consider that my understanding of the topic is demonstrated.
 
 ## CI Pipeline
 
