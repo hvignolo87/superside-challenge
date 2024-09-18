@@ -3,13 +3,20 @@ version: 2
 models:
   - name: fct_engagement_metrics
     description: ""
+    tests:
+      - dbt_expectations.expect_table_columns_to_contain_set:
+          column_list: ["project_id", "engagement_id"]
     columns:
       - name: project_id
         data_type: uuid
         description: ""
+        tests:
+          - not_null
       - name: engagement_id
         data_type: uuid
         description: ""
+        tests:
+          - not_null
       - name: customer_id
         data_type: integer
         description: ""
@@ -43,28 +50,55 @@ models:
       - name: service
         data_type: text
         description: ""
+        tests:
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              value_set: var('service_categories')
+              row_condition: "service IS NOT NULL"
       - name: sub_service
         data_type: character varying
         description: ""
+        tests:
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              value_set: var('sub_service_categories')
+              row_condition: "sub_service IS NOT NULL"
       - name: engagement_type
         data_type: character varying
         description: ""
+        tests:
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              value_set: var('engagement_type_categories')
+              row_condition: "engagement_type IS NOT NULL"
       - name: service_type
         data_type: character varying
         description: ""
+        tests:
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              value_set: var('service_categories')
+              row_condition: "service_type IS NOT NULL"
       - name: detailed_sub_service
         data_type: character varying
         description: ""
+        tests:
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              value_set: var('sub_service_categories')
+              row_condition: "detailed_sub_service IS NOT NULL"
 
   - name: project_engagement
     description: ""
+    tests:
+      - dbt_expectations.expect_table_columns_to_contain_set:
+          column_list: ["project_id", "engagement_id"]
     columns:
       - name: project_id
         data_type: uuid
         description: ""
+        tests:
+          - not_null
       - name: engagement_id
         data_type: uuid
         description: ""
+        tests:
+          - not_null
       - name: customer_id
         data_type: integer
         description: ""
@@ -101,9 +135,17 @@ models:
       - name: service
         data_type: text
         description: ""
+        tests:
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              value_set: var('service_categories')
+              row_condition: "service IS NOT NULL"
       - name: sub_service
         data_type: character varying
         description: ""
+        tests:
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              value_set: var('sub_service_categories')
+              row_condition: "sub_service IS NOT NULL"
       - name: dim_service
         data_type: character varying
         description: ""
@@ -113,12 +155,24 @@ models:
       - name: service_type
         data_type: character varying
         description: ""
+        tests:
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              value_set: var('service_categories')
+              row_condition: "service_type IS NOT NULL"
       - name: detailed_sub_service
         data_type: character varying
         description: ""
+        tests:
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              value_set: var('sub_service_categories')
+              row_condition: "detailed_sub_service IS NOT NULL"
       - name: engagement_type
         data_type: character varying
         description: ""
+        tests:
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              value_set: var('engagement_type_categories')
+              row_condition: "engagement_type IS NOT NULL"
       - name: folder
         data_type: character varying
         description: ""

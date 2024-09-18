@@ -3,16 +3,29 @@ version: 2
 models:
   - name: stg_clients__engagement_metrics
     description: ""
+    tests:
+      - dbt_expectations.expect_table_columns_to_contain_set:
+          column_list: ["project_id", "engagement_id"]
     columns:
       - name: project_id
         data_type: uuid
         description: ""
+        tests:
+          - not_null
       - name: engagement_id
         data_type: uuid
         description: ""
+        tests:
+          - not_null
       - name: customer_id
         data_type: character varying
         description: ""
+        tests:
+          - not_null:
+              config:
+                severity: error
+                error_if: ">5000"
+                warn_if: ">1000"
       - name: customer_name
         data_type: text
         description: ""
