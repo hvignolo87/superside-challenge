@@ -6,7 +6,7 @@ resource "helm_release" "airbyte" {
   version          = "0.594.0"
   namespace        = "airbyte"
   create_namespace = true
-  timeout          = 600
+  timeout          = 1200
 
   values = [
     file("${path.module}/airbyte-values.yml")
