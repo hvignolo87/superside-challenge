@@ -260,11 +260,11 @@ Verify that you can access the web servers by going to `http://localhost:8085` a
 
 Then, please complete the Airbyte's initial setup.
 
-![airbyte_ui](./images/airbyte_ui.png)
+<img src="./images/airbyte_ui.png" alt="airbyte_ui" style="vertical-align:middle">
 
 Once done, please copy the workspace id from the Airbyte UI.
 
-![workspace](./images/workspace.png)
+<img src="./images/workspace.png" alt="workspace" style="vertical-align:middle">
 
 Or by running:
 
@@ -311,3 +311,7 @@ The run:
 ```sql
 SELECT * FROM marts.engagement_metrics;
 ```
+
+## Data exploration
+
+Explanations here
