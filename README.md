@@ -176,7 +176,7 @@ The data flow is as follows (the provided raw data is in the `source_data` direc
 3. Then, Airflow triggers the dbt transformations, and the models are materialized in the `warehouse` DB, in separate schemas:
     - `staging`: materialized as a view, where simple casting and renaming is done, and has a 1-1 relation with the landing table.
     - `intermediate`: materialized as a view, where more complex transformations are done to normalize and prepare data for downstream consumption.
-    - `marts`: materialized as a table, where the `dim_project.csv` data is loaded as a seed, and then joined with the `fct_engagement_metrics` table in a model named `engagement_metrics`.
+    - `marts`: materialized as a table, where the `dim_project.csv` data is loaded as a seed, and then joined with the `fct_engagement_metrics` table in a model named `project_engagement`.
 
 ## Setup
 
