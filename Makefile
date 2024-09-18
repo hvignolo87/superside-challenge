@@ -237,8 +237,8 @@ dbt-test-model: ## Execute tests of a dbt model. Usage: make dbt-test-model node
 	poetry run dbt test $(node) --project-dir dbt/${PROJECT_NAME} --profiles-dir dbt/${PROJECT_NAME}
 
 .PHONY: dbt-build-model
-dbt-build-model: ## Build (run and test) a dbt model. Usage: make dbt-build-model node="--select stg_model"
-	$(call log, Testing dbt model $(node)...)
+dbt-build-model: ## Build (run, seed and test) a dbt model. Usage: make dbt-build-model node="--select stg_model"
+	$(call log, Building dbt model $(node)...)
 	poetry run dbt build $(node) --project-dir dbt/${PROJECT_NAME} --profiles-dir dbt/${PROJECT_NAME}
 
 .PHONY: dbt-seed-model
@@ -257,9 +257,9 @@ dbt-show-model: ## Show a dbt model. Usage: make dbt-show-model node="--select +
 	poetry run dbt show $(node) --project-dir dbt/${PROJECT_NAME} --profiles-dir dbt/${PROJECT_NAME}
 
 .PHONY: dbt-compile
-dbt-compile: ## Compile the dbt project. Usage: make dbt-compile
+dbt-compile: ## Compile the dbt project. Usage: make dbt-compile node="--select +stg_model"
 	$(call log, Compiling the dbt project...)
-	poetry run dbt compile --project-dir dbt/${PROJECT_NAME} --profiles-dir dbt/${PROJECT_NAME}
+	poetry run dbt compile $(node) --project-dir dbt/${PROJECT_NAME} --profiles-dir dbt/${PROJECT_NAME}
 
 .PHONY: dbt-install-pkgs
 dbt-install-pkgs: ## Install dbt packages. Usage: make dbt-install-pkgs
