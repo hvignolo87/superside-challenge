@@ -338,6 +338,28 @@ SELECT * FROM marts.project_engagement;
 
 Please go ahead and check the tables and views in the others schemas.
 
+#### Other credentials
+
+There are 3 more DDBB:
+
+- Database: `Clients`
+  - User: `clients`
+  - Password: `clients`
+  - Host: `localhost`
+  - Port: `5460`
+
+- Database: `Airflow Metadata`
+  - User: `airflow`
+  - Password: `airflow`
+  - Host: `localhost`
+  - Port: `5450`
+
+- Database: `Airbyte Metadata`
+  - User: `airbyte`
+  - Password: `airbyte`
+  - Host: `localhost`
+  - Port: `5440`
+
 ## Data exploration
 
 Before start building the models, I've explored the raw data to understand its nature and relation with the `dim_project` (which I verified is in a clean format, ready to be consumed as is). To do this, I loaded the raw data in a source table in the `Clients` DB, `engagement_metrics` table.
