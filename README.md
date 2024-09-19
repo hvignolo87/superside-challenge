@@ -128,7 +128,7 @@ This solution runs in a local kubernetes cluster, so is containerized. You'll ne
 Depending on your OS, the installation process will be different. If you're in macOS then run:
 
 ```bash
-brew install k3d docker docker-compose tfenv
+brew install k3d kubectl docker docker-compose tfenv
 tfenv install 1.5.6
 tfenv use 1.5.6
 ```
