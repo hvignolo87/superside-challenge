@@ -154,7 +154,7 @@ The selected data stack is as follows:
   - This DB was selected just for simplicity
 - A local [registry](https://registry.hub.docker.com/_/registry/) for storing and distributing container images
 
-Airbyte and Airflow are installed in the kubernetes cluster via Helm through its terraform providers. Also, the Airbyte source, destination, and connection are handled by Terraform.
+Airbyte and Airflow are installed in the kubernetes cluster via Helm through its Terraform provider. Also, the Airbyte source, destination, and connection are handled by Terraform.
 
 This is a simplified diagram of the architecture:
 
