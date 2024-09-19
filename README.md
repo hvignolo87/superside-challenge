@@ -356,6 +356,28 @@ SELECT * FROM marts.project_engagement;
 
 Please go ahead and check the tables and views in the others schemas.
 
+### 8. Handle the platforms and external services
+
+Please run `make help` for more information.
+
+The following command will stop both the cluster and the external services:
+
+```bash
+make cluster-stop
+```
+
+If you want to destroy these resources, you can run directly:
+
+```bash
+make cluster-delete
+```
+
+If you want to uninstall the deployed platforms, please run:
+
+```bash
+make cluster-uninstall-apps
+```
+
 #### Other credentials
 
 There are 3 more DDBB:
