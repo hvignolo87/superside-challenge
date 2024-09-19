@@ -49,3 +49,36 @@ models:
       +schema: marts
       +tags:
         - marts
+  audit_helper:
+    +docs:
+      show: false
+  codegen:
+    +docs:
+      show: false
+  dbt_date:
+    +docs:
+      show: false
+  dbt_expectations:
+    +docs:
+      show: false
+  dbt_utils:
+    +docs:
+      show: false
+
+seeds:
+  warehouse:
+    +docs:
+      show: false
+    +tags:
+      - seeds
+      - seed
+
+sources:
+  warehouse:
+    +docs:
+      show: false
+
+analyses:
+  warehouse:
+    +docs:
+      show: false

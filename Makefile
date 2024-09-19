@@ -275,11 +275,12 @@ dbt-debug: ## Debug the dbt project. Usage: make dbt-debug
 dbt-docs-generate: ## Generate documentation of the dbt project. Usage: make dbt-docs-generate
 	$(call log, Generating the documentation website for the dbt project...)
 	cd dbt/${PROJECT_NAME} && \
-	poetry run dbt docs generate --compile && \
+	poetry run dbt docs generate --target prod --compile  && \
 	cd ../.. && \
 	poetry run python3 scripts/hide_dbt_resources_from_docs.py \
-		--exclude-macro delete_deleted_ids \
-		--exclude-macro generate_schema_name \
+		--exclude-macro macro.${PROJECT_NAME}.generate_schema_name \
+		--exclude-macro macro.${PROJECT_NAME}.extract_number \
+		--exclude-macro macro.${PROJECT_NAME}.map_categories \
 		--dbt-project-dir dbt/${PROJECT_NAME}
 
 .PHONY: dbt-docs-serve

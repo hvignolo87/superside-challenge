@@ -454,7 +454,7 @@ You can check the results of this process in the `warehouse.marts.project_engame
 
 #### dbt macros
 
-As all this logic related to data normalization was the same for almost all the columns, so I've encapsulated it some macros.
+As all this logic related to data normalization was the same for almost all the columns, so I've encapsulated it in some macros. Please go ahead and check the `dbt/superside/macros` directory.
 
 ### Relationships
 
@@ -469,6 +469,19 @@ After further analysis, and as there was no source documentation provided, I was
 I tried to enforce contracts both in the staging and marts layer, but it turned out that dbt 1.5 [has a bug](https://github.com/dbt-labs/dbt-postgres/issues/54) with this feature when the data types are UUID.
 
 I have implemented tests to ensure unique keys, non-nullity, and categories in the intermediate and final models. I can implement more, but I consider that my understanding of the subject is demonstrated.
+
+### dbt documentation
+
+Do you want to know more about the dbt project? Please go ahead and serve its documentation in you machine:
+
+```bash
+make dbt-docs-generate
+make dbt-docs-serve port="9000"
+```
+
+This will open the documentation in your browser. Adjust the port number if needed.
+
+Please take a look at the `scripts/hide_dbt_resources_from_docs.py` file. It contains an useful script to hide dbt resources from the docs that can't be hidden because of some bugs with dbt.
 
 ## CI Pipeline
 

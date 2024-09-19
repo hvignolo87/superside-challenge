@@ -4,7 +4,7 @@ macros:
   - name: generate_schema_name
     description: "Dynamically generates a schema name, depending on the environment"
     docs:
-      show: false
+      show: true
     arguments:
       - name: custom_schema_name
         type: string
@@ -16,7 +16,7 @@ macros:
   - name: extract_number
     description: Extracts a number from a string, and casts it to a given data type
     docs:
-      show: false
+      show: true
     arguments:
       - name: column
         type: string
@@ -35,7 +35,7 @@ macros:
     description: |
       Maps a given string to a list of categories, by comparing its Levenshtein distance to a threshold
     docs:
-      show: false
+      show: true
     arguments:
       - name: column
         type: string
