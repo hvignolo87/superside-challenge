@@ -33,22 +33,6 @@ def hide_dbt_resources_from_docs(
     https://github.com/dbt-labs/dbt-core/issues/8061
 
     This is a workaround for that issue https://dbtips.substack.com/p/dbtips-digest-1
-
-    Parameters
-    ----------
-    dbt_project_dir: str or None
-        The path to the dbt project directory
-    exclude_macro: Tuple[str]
-        The name of the macro to exclude from hiding in the docs
-
-    Returns
-    -------
-    None
-
-    Raises
-    ------
-    FileNotFoundError
-        If the manifest file is not found
     """
     dbt_project_path = Path.cwd() if not dbt_project_dir else Path(dbt_project_dir)
     manifest_path = dbt_project_path / "target" / "manifest.json"

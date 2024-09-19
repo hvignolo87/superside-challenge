@@ -481,7 +481,11 @@ make dbt-docs-serve port="9000"
 
 This will open the documentation in your browser. Adjust the port number if needed.
 
-Please take a look at the `scripts/hide_dbt_resources_from_docs.py` file. It contains an useful script to hide dbt resources from the docs that can't be hidden because of some bugs with dbt.
+Please take a look at the `scripts/hide_dbt_resources_from_docs.py` file. It contains an useful CLI to hide dbt resources from the docs that can't be hidden because of some bugs with dbt.
+
+<p align="center">
+  <img src="./images/cli.png" alt="cli" style="vertical-align:middle">
+</p>
 
 ## CI Pipeline
 
