@@ -2,7 +2,7 @@
 
 [![Kubernetes](https://img.shields.io/badge/kubernetes-1.3-blue.svg?logo=kubernetes&labelColor=lightgray)](<https://kubernetes.io/>) [![Terraform](https://img.shields.io/badge/terraform-1.5-blue.svg?logo=terraform&labelColor=lightgray)](<https://www.terraform.io/>) <br>
 
-[![Airbyte](https://img.shields.io/badge/airbyte-0.64.4-blue.svg?logo=airbyte&labelColor=lightgray)](https://airflow.apache.org/docs/apache-airflow/2.6.3/index.html) [![Apache Airflow](https://img.shields.io/badge/Apache%20Airflow-2.6.3-green.svg?logo=apacheairflow)](https://airflow.apache.org/docs/apache-airflow/2.6.3/index.html) [![Python 3.10.12](https://img.shields.io/badge/python-3.10.12-blue.svg?labelColor=%23FFE873&logo=python)](https://www.python.org/downloads/release/python-31012/) ![dbt-version](https://img.shields.io/badge/dbt-version?style=flat&logo=dbt&label=1.5&link=https%3A%2F%2Fdocs.getdbt.com%2Fdocs%2Fintroduction) <br>
+[![Airbyte](https://img.shields.io/badge/airbyte-0.64.4-blue.svg?logo=airbyte&labelColor=lightgray)](https://airbyte.com/) [![Apache Airflow](https://img.shields.io/badge/Apache%20Airflow-2.6.3-green.svg?logo=apacheairflow)](https://airflow.apache.org/docs/apache-airflow/2.6.3/index.html) [![Python 3.10.12](https://img.shields.io/badge/python-3.10.12-blue.svg?labelColor=%23FFE873&logo=python)](https://www.python.org/downloads/release/python-31012/) [![dbt-version](https://img.shields.io/badge/dbt-version?style=flat&logo=dbt&label=1.5&link=https%3A%2F%2Fdocs.getdbt.com%2Fdocs%2Fintroduction)](https://docs.getdbt.com/) <br>
 
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://docs.astral.sh/ruff/) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://black.readthedocs.io/en/stable/) [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)<br>
 
@@ -476,7 +476,7 @@ You can check the results of this process in the `warehouse.marts.project_engame
 
 #### dbt macros
 
-As all this logic related to data normalization was the same for almost all the columns, so I've encapsulated it in some macros. Please go ahead and check the `dbt/superside/macros` directory.
+All this logic related to data normalization was the same for almost all the columns, so I've encapsulated it in some macros. Please go ahead and check the `dbt/superside/macros` directory.
 
 ### Relationships
 
