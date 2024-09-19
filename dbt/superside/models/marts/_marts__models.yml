@@ -6,6 +6,8 @@ models:
     tests:
       - dbt_expectations.expect_table_columns_to_contain_set:
           column_list: ["project_id", "engagement_id"]
+      - dbt_expectations.expect_compound_columns_to_be_unique:
+          column_list: ["project_id", "engagement_id"]
     columns:
       - name: project_id
         data_type: uuid
@@ -87,6 +89,8 @@ models:
     description: ""
     tests:
       - dbt_expectations.expect_table_columns_to_contain_set:
+          column_list: ["project_id", "engagement_id"]
+      - dbt_expectations.expect_compound_columns_to_be_unique:
           column_list: ["project_id", "engagement_id"]
     columns:
       - name: project_id
