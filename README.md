@@ -114,6 +114,8 @@ This is the structure of the project.
 
 ## What you'll need
 
+> :orange_book: It's recommended to take your time and read this whole guide before running any command
+
 This solution runs in a local kubernetes cluster, so is containerized. You'll need the following mandatory tools in your local machine:
 
 - [k3d](https://k3d.io/v5.6.0/#installation) for the local k8s cluster
@@ -230,7 +232,7 @@ To install the pre-commit hooks and play around with them.
 
 > :warning: Remember to assign the 10 GB of RAM in Docker Desktop.
 
-Run these command and wait a while for the cluster to be ready:
+Run this command and wait a while for the cluster to be ready:
 
 ```bash
 make cluster-create
@@ -378,9 +380,21 @@ There are 3 more DDBB:
 
 ## Data exploration
 
-Before start building the models, I've explored the raw data to understand its nature and relation with the `dim_project` (which I verified is in a clean format, ready to be consumed as is). To do this, I loaded the raw data in a source table in the `Clients` DB, `engagement_metrics` table.
+Before starting to build the models, I explored the raw data to understand its nature and relation with the `dim_project` (which I verified is in a clean format, ready to be consumed as is). To do this, I loaded the raw data in a source table in the `Clients` DB, `engagement_metrics` table. Some things that came up from the analysis are in the following section.
 
-Some things that came up from the analysis are the following.
+If you want to check the data and you have few resources in your machine, you don't need to keep the k8s cluster up and running for this. You can stop it with:
+
+```bash
+make cluster-stop
+```
+
+And then just start the external services (DDBB and registry) with:
+
+```bash
+make up
+```
+
+This will set up a much lighter environment that you can use for data exploration.
 
 ### Presence of duplicates
 
@@ -414,17 +428,29 @@ After further exploring the data, I noticed that the dates are in various format
 
 Something similar happened with the names of the clients. They had typos and inconsistencies which were fixed.
 
-On the other hand, the `employee_count` column contained numbers but in 2 cases it contained the words `fifty` and `hundred`, so they were replaced by their associated numbers.
+On the other hand, the `employee_count` column contained numbers but in 2 cases it contained the words `fifty` and `hundred`, so they were replaced by their associated numbers because I thought that these values would be more useful as integers rather than `varchar`.
 
-All the columns associated with monetary values ​​had the same problem. In addition to the number, they contained the currency symbol, and in some cases the suffix `k`. I assumed that all currencies were the same, and that `k` meant 10<sup>3</sup>, so I adjusted the data accordingly.
+All the columns associated with monetary values ​​had the same characteristics. In addition to the number, they contained the currency symbol, and in some cases the suffix `k`. I assumed that:
+
+- All currencies were the same
+- The suffix `k` meant 10<sup>3</sup>
+- These values would need to be converted to integers
+
+So I adjusted this data accordingly.
 
 #### Levenshtein distance
 
-The most interesting part was that almost all columns seem to contain some categories, but these contain spelling errors in different positions. To fix this issue more cleanly, I've used the [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance).
+The most interesting part was that almost all columns seem to contain some categories, but these contain spelling errors in different positions of the sequences. To fix this issue more cleanly, I've used the [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance).
 
 As dbt doesn't provide an out-of-the-box package or method for this, I've installed the [fuzzystrmatch](https://www.postgresql.org/docs/14/fuzzystrmatch.html#id-1.11.7.24.7) extension in the `warehouse`.
 
 After some tests, I found that all the misspelled categories were within a Levenshtein distance of less than 2 from their correct categories. You can find all these categories in the dbt project-level variables declared in the `dbt_project.yml` file.
+
+You can check the results of this process in the `warehouse.marts.project_engament` table, for example, by running (analogous for the other columns):
+
+<p align="center">
+  <img src="./images/categories.png" alt="categories" style="vertical-align:middle">
+</p>
 
 #### dbt macros
 
