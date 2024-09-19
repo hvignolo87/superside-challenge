@@ -4,6 +4,17 @@
     )
 }}
 
+{%- set dates_mappings = {
+    '^\d{2}/\d{2}/\d{4}$': 'MM/DD/YYYY',
+    '^\d{4}/\d{2}/\d{2}$': 'YYYY/MM/DD',
+    '^\d{4}-\d{2}-\d{2}$': 'YYYY-MM-DD',
+    '^\d{2}-\d{2}-\d{4}$': 'DD-MM-YYYY',
+    '^\d{2}\.\d{2}\.\d{4}$': 'DD.MM.YYYY',
+    '^\d{4}\.\d{2}\.\d{2}$': 'YYYY.MM.DD',
+    '^\d{2}\.\d{2}\.\d{4}$': 'MM.DD.YYYY',
+    '^\d{2}/\d{2}/\d{2}$': 'MM/DD/YY'
+ } -%}
+
 SELECT
     project_id
     , engagement_id
@@ -19,24 +30,16 @@ SELECT
         WHEN POSITION('_' IN customer_name) > 0
             THEN 'customer_' || SUBSTRING(SPLIT_PART(customer_name, '_', 2) FROM '[0-9]+')
     END AS customer_name
-    , CASE
-        WHEN engagement_date ~ '^\d{2}/\d{2}/\d{4}$'
-            THEN TO_DATE(engagement_date, 'MM/DD/YYYY')
-        WHEN engagement_date ~ '^\d{4}/\d{2}/\d{2}$'
-            THEN TO_DATE(engagement_date, 'YYYY/MM/DD')
-        WHEN engagement_date ~ '^\d{4}-\d{2}-\d{2}$'
-            THEN TO_DATE(engagement_date, 'YYYY-MM-DD')
-        WHEN engagement_date ~ '^\d{2}-\d{2}-\d{4}$'
-            THEN TO_DATE(engagement_date, 'DD-MM-YYYY')
-        WHEN engagement_date ~ '^\d{2}\.\d{2}\.\d{4}$'
-            THEN TO_DATE(engagement_date, 'DD.MM.YYYY')
-        WHEN engagement_date ~ '^\d{4}\.\d{2}\.\d{2}$'
-            THEN TO_DATE(engagement_date, 'YYYY.MM.DD')
-        WHEN engagement_date ~ '^\d{2}\.\d{2}\.\d{4}$'
-            THEN TO_DATE(engagement_date, 'MM.DD.YYYY')
-        WHEN engagement_date ~ '^\d{2}/\d{2}/\d{2}$'
-            THEN TO_DATE(engagement_date, 'MM/DD/YY')
-    END::date AS engagement_date
+    {% for regex, date_format in dates_mappings.items() -%}
+        {% if loop.first -%}
+            , CASE
+        {%- endif %}
+            WHEN engagement_date ~ '{{ regex }}'
+                THEN TO_DATE(engagement_date, '{{ date_format }}')
+        {%- if loop.last %}
+            END::date AS engagement_date
+        {%- endif -%}
+    {%- endfor %}
     , CASE
         WHEN employee_count IS NULL
             THEN NULL
