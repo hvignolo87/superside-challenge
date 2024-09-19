@@ -77,13 +77,19 @@ This is the structure of the project.
 │       │   └── .gitkeep
 │       └── tests
 │           └── .gitkeep
+├── dbt_packages
 ├── diagrams
 │   ├── airbyte.png
 │   ├── diagram.py
 │   └── kubernetes.png
 ├── docker-compose.yml
 ├── images
-│   └── cluster.png
+│   ├── airbyte_ui.png
+│   ├── cluster.png
+│   ├── make.png
+│   ├── transformations.png
+│   ├── uk.png
+│   └── workspace.png
 ├── infra
 │   ├── .terraform.lock.hcl
 │   ├── airbyte-values.yml
@@ -101,15 +107,14 @@ This is the structure of the project.
 │   ├── clients_postgres_init.sh
 │   └── warehouse_postgres_init.sh
 └── source_data
-    ├── dim_project.csv
     └── engagement_metrics_raw.csv
 
-24 directories, 64 files
+26 directories, 68 files
 ```
 
 ## What you'll need
 
-This solution is runs in a local kubernetes cluster, so is containerized. You'll need the following mandatory tools in your local machine:
+This solution runs in a local kubernetes cluster, so is containerized. You'll need the following mandatory tools in your local machine:
 
 - [k3d](https://k3d.io/v5.6.0/#installation) for the local k8s cluster
 - [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl) to manage the k8s cluster through the CLI
@@ -120,7 +125,7 @@ This solution is runs in a local kubernetes cluster, so is containerized. You'll
 - [poetry](https://python-poetry.org/docs/#installing-with-the-official-installer) to handle python dependencies
   - There's an useful make rule for this one, so you can skip its installation
 
-Depending on your OS your installation process will be different. If you're in macOS you can run:
+Depending on your OS, the installation process will be different. If you're in macOS then run:
 
 ```bash
 brew install k3d docker docker-compose tfenv
@@ -139,15 +144,17 @@ There are other optional dependencies:
 The selected data stack is as follows:
 
 - [Airbyte](https://airbyte.com/) for data movement
+  - The Airbyte metadata DB is external to the cluster
 - [Airflow](https://airflow.apache.org/) for workflow orchestration
-  - The Airflow cluster is deployed with the `CeleryExecutor` and a Redis database working as a message broker between Celery and the worker.
+  - The Airflow cluster is deployed with the `CeleryExecutor` and a Redis database working as a message broker between Celery and the worker
+  - The Airflow metadata DB is external to the cluster
 - [dbt](https://docs.getdbt.com/) for data modeling
   - The Airflow and dbt integration was made through [cosmos](https://astronomer.github.io/astronomer-cosmos/)
 - [Postgres](https://www.postgresql.org/) for data storage
   - This DB was selected just for simplicity
 - A local [registry](https://registry.hub.docker.com/_/registry/) for storing and distributing container images
 
-Airbyte and Airflow are installed in the kubernetes cluster via helm through its terraform providers.
+Airbyte and Airflow are installed in the kubernetes cluster via Helm through its terraform providers. Also, the Airbyte source, destination, and connection are handled by Terraform.
 
 This is a simplified diagram of the architecture:
 
@@ -166,14 +173,17 @@ Both platforms will run its jobs in ephemeral pods, which will be scheduled in a
 - The nodes and its pods' resources, requests, and limits can be managed separately
 - The ephemeral pods' resources can be modified through Airflow variables, as I've used the [kubernetesPodOperator](https://airflow.apache.org/docs/apache-airflow-providers-cncf-kubernetes/stable/operators.html#kubernetespodoperator) in the transformations DAG, making it easier to manage them
 
+Moreover, the databases were deployed as external services (outside the cluster) in order to ensure the statelessness of the cluster and persist its state.
+
 ### Data flow
 
 The data flow is as follows (the provided raw data is in the `source_data` directory):
 
 1. The raw `engagement_metrics_raw.csv` data is loaded into the `clients` DB through the `scripts/clients_postgres_init.sh` script. This DB is considered as a source.
-    - This was done to better emulate a production environment, and to allow me to use Airbyte, because otherwise I would need [these credentials](https://docs.airbyte.com/integrations/sources/google-sheets#prerequisites) which I don't have, in order to sync the data directly from the Google Sheets.
+    - This was done to better emulate a production environment, and to allow me to use Airbyte, because otherwise, I would need [these credentials](https://docs.airbyte.com/integrations/sources/google-sheets#prerequisites) which I don't have, in order to sync the data directly from the Google Sheets.
+    - Another option could have been to create a Python script that runs on a DAG in Airflow and loads the data into the DB. I considered Airbyte a much more robust, resilient, and practical option.
 2. Once Airbyte runs its sync, the raw data is moved to the `warehouse` DB, which is the destination. You'll find the data in the `clients.engagement_metrics` landing table.
-3. Then, Airflow triggers the dbt transformations, and the models are materialized in the `warehouse` DB, in separate schemas:
+3. Then, Airflow triggers the dbt transformations and tests, and the models are materialized in the `warehouse` DB, in separate schemas:
     - `staging`: materialized as a view, where simple casting and renaming is done, and has a 1-1 relation with the landing table.
     - `intermediate`: materialized as a view, where more complex transformations are done to normalize and prepare data for downstream consumption.
     - `marts`: materialized as a table, where the `dim_project.csv` data is loaded as a seed, and then joined with the `fct_engagement_metrics` table in a model named `project_engagement`.
@@ -194,9 +204,11 @@ make generate-dotenv
 
 This will generate two `.env` files with predefined values. Please, go ahead and open it! If you want to modify some values, just take into account that this may break some things.
 
+If you want to run any dbt command without the `--target prod` option, please fill the `DBT_SCHEMA` variable in the `.env.dbt.local` file.
+
 ### 2. Install the project dependencies
 
-Run these commands in this sequence (beware if you've `poetry` already installed in your machine):
+Run these commands in this sequence (beware if you've `poetry` already installed in your machine, as version 1.6.1 will be installed by default):
 
 ```bash
 make install-poetry
@@ -246,7 +258,7 @@ To deploy Airbyte and Airflow in the cluster, run:
 make cluster-install-apps
 ```
 
-This will take a while (10-15 minutes, depending on your machine), but you can monitor the state the same way you did before.
+This will take a while (10-15 minutes, depending on your machine), but you can monitor the state the same way you did before. Please wait until this process finishes before continuing.
 
 ### 5. Setup Airbyte
 
@@ -294,11 +306,13 @@ Once finished, go to the Airbyte's connections, and you'll see a new one named `
 
 ### 6. Run the dbt models with Airflow
 
-As the dbt models will run in ephemeral pods via the [kubernetesPodOperator](https://airflow.apache.org/docs/apache-airflow-providers-cncf-kubernetes/stable/operators.html#kubernetespodoperator), you'll need to provide an image to the containers. To do this, please run:
+As the dbt models will run in ephemeral pods via the [kubernetesPodOperator](https://airflow.apache.org/docs/apache-airflow-providers-cncf-kubernetes/stable/operators.html#kubernetespodoperator), you'll need to provide an image to the containers. To create it, please run:
 
 ```bash
 make cluster-local-image
 ```
+
+> :bulb: Any time you change something in a dbt model, you need to re-run it.
 
 Go to [http://localhost:8090](http://localhost:8090), and login with the default credentials `airflow:airflow`.
 
@@ -330,7 +344,7 @@ Open your SQL client and connect to the warehouse. These are the credentials:
 - Host: `localhost`
 - Port: `5470`
 
-The run:
+Then run the following query to fetch the results of the joined data:
 
 ```sql
 SELECT * FROM marts.project_engagement;
@@ -364,7 +378,7 @@ There are 3 more DDBB:
 
 Before start building the models, I've explored the raw data to understand its nature and relation with the `dim_project` (which I verified is in a clean format, ready to be consumed as is). To do this, I loaded the raw data in a source table in the `Clients` DB, `engagement_metrics` table.
 
-Some things that came up from the analysis are:
+Some things that came up from the analysis are the following.
 
 ### Presence of duplicates
 
@@ -383,10 +397,10 @@ WHERE project_id IN ('0bf50700-a93a-4e7d-8a04-30a6116acbeb', 'e34525ca-b73d-41b0
     AND engagement_id IN ('035ae529-0ace-4a6b-b0bf-95c85ff5af03', '11089782-22e7-43fd-8ace-221538ea812a')
 ```
 
-And realized that:
+And noticed that:
 
 - The row with `customer_name = 'Customer_305'` is duplicated, since all its columns has the same values.
-- The row with `customer_name = 'Customer_561'` has all its columns with the same values, except for the `service`, which differs between `Consulting` and `Design`, and `Strateby` and `Frontend` in the sub_service column.
+- The row with `customer_name = 'Customer_561'` has all its columns with the same values, except for the `service`, which differs between `Consulting` and `Design`, and `Strateby` and `Frontend` in the `sub_service` column.
 
 Because of this, I've decided to deduplicate with the `ROW_NUMBER()` window function, because both cases seems duplicates to me.
 
@@ -396,7 +410,7 @@ All these transformations happen in the intermediate layer.
 
 After further exploring the data, I noticed that the dates are in various formats, which is another issue that needs to be fixed.
 
-Something similar happened with the names of the clients. They had typos, which were fixed.
+Something similar happened with the names of the clients. They had typos and inconsistencies which were fixed.
 
 On the other hand, the `employee_count` column contained numbers but in 2 cases it contained the words `fifty` and `hundred`, so they were replaced by their associated numbers.
 
@@ -408,33 +422,33 @@ The most interesting part was that almost all columns seem to contain some categ
 
 As dbt doesn't provide an out-of-the-box package or method for this, I've installed the [fuzzystrmatch](https://www.postgresql.org/docs/14/fuzzystrmatch.html#id-1.11.7.24.7) extension in the `warehouse`.
 
-After some tests, I found that all the misspelled categories were within a Levenshtein distance of less than 2 from their correct categories.
+After some tests, I found that all the misspelled categories were within a Levenshtein distance of less than 2 from their correct categories. You can find all these categories in the dbt project-level variables declared in the `dbt_project.yml` file.
 
 #### dbt macros
 
-As all this logic was the same for almost all the columns, I've encapsulated it some macros.
+As all this logic related to data normalization was the same for almost all the columns, so I've encapsulated it some macros.
 
 ### Relationships
 
-I checked that all the values in the `warehouse.clients.engagement_metrics.project_id` column corresponds to a value in the `warehouse.marts.dim_project.project_id` column. On the other hand, if I use this criterion to join them, some values look odd. For example, in some cases, the `engagement_date` was greater than the `date_project_ended` column, which is confusing.
+I checked that all the values in the `warehouse.clients.engagement_metrics.project_id` column corresponds to a value in the `warehouse.marts.dim_project.project_id` column, and vice versa. On the other hand, if I use this criterion to join them, some values look odd. For example, in some cases, the `engagement_date` was greater than the `date_project_ended` column, which is confusing.
 
-Another thing that I found is that, in the joined table, the `customer_id` differs from the one in the `dim_project` column. If I add this condition to the join statement, it happens that only ~90 rows match it. This also seemed weird to me, so I left it without this condition.
+Another thing that I found is that, in the joined table, the `customer_id` differs from the one in the `dim_project` column for the same `project_id`. If I add `customer_id` as a join condition, it happens that only ~90 rows match it. This also seemed weird to me, so I left it without this condition.
 
-After further analysis, and as there were no source documentation provided, I wasn't able to determine if there was a problem with the data or if I was missing something, so I decided to join just for `project_id`.
+After further analysis, and as there was no source documentation provided, I wasn't able to determine if there was a problem with the data or if I was missing something, so I decided to perform the join just for `project_id`.
 
 ## Final comments and issues found
 
-I tried to enforce contracts both in staging and marts layer, but it turned out that dbt 1.5 [has a bug](https://github.com/dbt-labs/dbt-postgres/issues/54) with this feature when the data types are UUID.
+I tried to enforce contracts both in the staging and marts layer, but it turned out that dbt 1.5 [has a bug](https://github.com/dbt-labs/dbt-postgres/issues/54) with this feature when the data types are UUID.
 
-I have implemented tests to ensure unique keys, non-nullity, and categories in the intermediate and final models. I can implement more, but I consider that my understanding of the topic is demonstrated.
+I have implemented tests to ensure unique keys, non-nullity, and categories in the intermediate and final models. I can implement more, but I consider that my understanding of the subject is demonstrated.
 
 ## CI Pipeline
 
-I've deployed a simple CI pipeline to run the pre-commit hooks in a Github runner. Pleas go ahead and check the workflow file.
+I've deployed a simple CI pipeline to run the pre-commit hooks in a Github runner. Pleas go ahead and check the workflow file, and the previous runs in the repository.
 
 ## More commands and help
 
-If you're struggling with some commands, please run `make help` to get all the available commands.
+If you're struggling with some commands, please run `make help` to get all the available commands and its usage examples.
 
 <p align="center">
   <img src="./images/make.png" alt="make" style="vertical-align:middle">
