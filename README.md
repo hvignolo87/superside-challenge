@@ -298,6 +298,8 @@ Or by running:
 curl -u airbyte:airbyte http://localhost:8001/api/public/v1/workspaces
 ```
 
+Also, just if you want, go to settings and upgrade all the sources and destinations connectors' versions.
+
 Then, please fill the `workspace_id` in the `infra/variables.tf` file and run:
 
 ```bash
