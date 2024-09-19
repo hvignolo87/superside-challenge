@@ -170,10 +170,10 @@ Both platforms will run its jobs in ephemeral pods, which will be scheduled in a
 
 - If using a node provisioner like [karpenter](https://karpenter.sh/), this architectue allows to provide ephemeral nodes just to run this workloads an then remove them, saving costs.
 - As the pods runs in isolated environments, any kind of disruption won't affect the other platform's components.
-- The nodes and its pods' resources, requests, and limits can be managed separately
-- The ephemeral pods' resources can be modified through Airflow variables, as I've used the [kubernetesPodOperator](https://airflow.apache.org/docs/apache-airflow-providers-cncf-kubernetes/stable/operators.html#kubernetespodoperator) in the transformations DAG, making it easier to manage them
+- The nodes and its pods' resources, requests, and limits can be managed separately.
+- The ephemeral pods' resources can be modified through Airflow variables, as I've used the [kubernetesPodOperator](https://airflow.apache.org/docs/apache-airflow-providers-cncf-kubernetes/stable/operators.html#kubernetespodoperator) in the `transformations` DAG, making it easier to manage them.
 
-Moreover, the databases were deployed as external services (outside the cluster) in order to ensure the statelessness of the cluster and persist its state.
+Moreover, the databases were deployed as external services (outside the cluster) in order to ensure the statelessness of the cluster and seamlessly persist the platforms' states.
 
 ### Data flow
 
@@ -187,6 +187,8 @@ The data flow is as follows (the provided raw data is in the `source_data` direc
     - `staging`: materialized as a view, where simple casting and renaming is done, and has a 1-1 relation with the landing table.
     - `intermediate`: materialized as a view, where more complex transformations are done to normalize and prepare data for downstream consumption.
     - `marts`: materialized as a table, where the `dim_project.csv` data is loaded as a seed, and then joined with the `fct_engagement_metrics` table in a model named `project_engagement`.
+
+Please go ahead and check the red arrows in the architecture diagram.
 
 ## Setup
 
@@ -312,11 +314,11 @@ As the dbt models will run in ephemeral pods via the [kubernetesPodOperator](htt
 make cluster-local-image
 ```
 
-> :bulb: Any time you change something in a dbt model, you need to re-run it.
+> :bulb: Any time you change something in a dbt model, you need to re-run this command to update the image.
 
 Go to [http://localhost:8090](http://localhost:8090), and login with the default credentials `airflow:airflow`.
 
-Then, unpause the `transformations` DAG. You should see how the dbt models are running in the ephemeral pods (scheduled in the node with label `component=jobs`). Please check this with Lens, or by running:
+Then, unpause the `transformations` DAG. You should see how the dbt models and tests are running in the ephemeral pods (scheduled in the node with label `component=jobs`). Please check this with Lens, or by running:
 
 ```bash
 watch -d kubectl get pods \
@@ -328,7 +330,7 @@ watch -d kubectl get pods \
     )
 ```
 
-Then, wait around 2 minutes until the models run. The DAG looks as follows:
+Then, wait around 3 minutes until the models and tests run. The DAG looks as follows:
 
 <p align="center">
   <img src="./images/transformations.png" alt="transformations" style="vertical-align:middle">
