@@ -330,7 +330,7 @@ watch -d kubectl get pods \
   --field-selector spec.nodeName=$(
       kubectl get nodes \
         -l component=jobs \
-        -o jsonpath='{.items[0].metadata.name}'
+        -o jsonpath='{.items[0].metadata.name}' \
     )
 ```
 
