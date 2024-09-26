@@ -56,7 +56,7 @@ install-poetry: ## Install poetry. Usage: make install-poetry
 .PHONY: install-project
 install-project: ## Install the project dependencies. Usage: make install-project
 	$(call log, Installing project dependencies...)
-	poetry install --no-interaction --all-extras --with dev --sync
+	poetry install --no-interaction --all-extras --with dev,docs --sync
 
 .PHONY: install-pre-commit
 install-pre-commit: ## Install pre-commit and git hooks. Usage: make install-pre-commit
