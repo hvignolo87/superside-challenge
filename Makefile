@@ -56,7 +56,7 @@ install-poetry: ## Install poetry. Usage: make install-poetry
 .PHONY: install-project
 install-project: ## Install the project dependencies. Usage: make install-project
 	$(call log, Installing project dependencies...)
-	poetry install --no-interaction --all-extras --with dev --sync
+	poetry install --no-interaction --all-extras --with dev,docs --sync
 
 .PHONY: install-pre-commit
 install-pre-commit: ## Install pre-commit and git hooks. Usage: make install-pre-commit
@@ -81,17 +81,17 @@ format-python: ## Format a Python file. Usage: make format-python path="./dags/m
 .PHONY: lint-sql
 lint-sql: ## Lint a SQL file. Usage: make lint-sql path="./path/to/my_file.sql"
 	$(call log, Linting $(path)...)
-	poetry run sqlfluff lint --config ./.sqlfluff $(path)
+	poetry run sqlfluff lint --config ./dbt/${PROJECT_NAME}/.sqlfluff $(path)
 
 .PHONY: fix-sql
 fix-sql: ## Apply fixes to a SQL file. Usage: make fix-sql path="./path/to/my_file.sql"
 	$(call log, Fixing $(path)...)
-	poetry run sqlfluff fix --force --config ./.sqlfluff $(path)
+	poetry run sqlfluff fix --force --config ./dbt/${PROJECT_NAME}/.sqlfluff $(path)
 
 .PHONY: format-sql
 format-sql: ## Format a SQL file. Usage: make format-sql path="./path/to/my_file.sql"
 	$(call log, Formatting $(path)...)
-	poetry run sqlfluff format --config ./.sqlfluff $(path)
+	poetry run sqlfluff format --config ./dbt/${PROJECT_NAME}/.sqlfluff $(path)
 
 
 ##@ Pre-commit hooks
