@@ -138,7 +138,7 @@ tfenv use 1.5.6
 There are other optional dependencies:
 
 - [Lens](https://k8slens.dev/) to easily manage the k8s cluster
-- [DBeaver](https://dbeaver.io/download/) as a desktop SQL client like
+- [DBeaver](https://dbeaver.io/download/) as a desktop SQL client
 - The recommended VS Code extensions
 
 ## Architecture overview
@@ -330,7 +330,7 @@ watch -d kubectl get pods \
   --field-selector spec.nodeName=$(
       kubectl get nodes \
         -l component=jobs \
-        -o jsonpath='{.items[0].metadata.name}'
+        -o jsonpath='{.items[0].metadata.name}' \
     )
 ```
 

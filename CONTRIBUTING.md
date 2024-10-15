@@ -93,6 +93,8 @@ The following is the list of supported scopes:
 - `cicd`
 - `docker`
 - `infra`
+- `dags`
+- `dbt`
 - none/empty string: useful for `test` changes that are done across all packages (i.e `test: add the X test`)
 
 #### Description
